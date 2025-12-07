@@ -1,34 +1,44 @@
-document.addEventListener("DOMContentLoaded", () => {
+// Elements
+const startBtn = document.getElementById("start-btn");
+const titleScreen = document.getElementById("title-screen");
+const gameScreen = document.getElementById("game-screen");
+const textBox = document.getElementById("text-box");
+const choicesDiv = document.getElementById("choices");
 
-    const startBtn = document.getElementById("start-btn");
-    const choicesDiv = document.getElementById("choices");
-    const textBox = document.getElementById("text-box");
+// Start button
+startBtn.onclick = startGame;
 
-    // Start the game when Begin button is clicked
-    startBtn.onclick = startGame;
+function startGame() {
+    titleScreen.style.display = "none";
+    gameScreen.style.display = "block";
+    scene1();
+}
 
-    function startGame() {
-        document.getElementById("title-screen").style.display = "none";
-        document.getElementById("game-screen").style.display = "block";
-        scene1();
-    }
-
-    // TYPEWRITER EFFECT
-    function typeText(text, callback) {
+// ======== TYPEWRITER SYSTEM WITH SKIP ========
+function typeText(text, callback) {
     textBox.innerHTML = "";
-    choicesDiv.innerHTML = ""; // hide choices while typing
-
+    choicesDiv.innerHTML = "";
+    
     let i = 0;
-    const speed = 12; // faster
+    const speed = 20; // smaller = faster
     let typing = true;
+
+    // Add visual hint
+    const skipHint = document.createElement("div");
+    skipHint.style.fontSize = "14px";
+    skipHint.style.opacity = "0.7";
+    skipHint.style.marginTop = "10px";
+    skipHint.textContent = "Press Enter to skip...";
+    textBox.appendChild(skipHint);
 
     function type() {
         if (i < text.length) {
-            textBox.innerHTML += text.charAt(i);
+            textBox.innerHTML = text.substring(0, i + 1);
             i++;
             setTimeout(type, speed);
         } else {
             typing = false;
+            skipHint.remove(); // remove hint when finished
             if (callback) callback();
         }
     }
@@ -40,25 +50,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.key === "Enter" && typing) {
             typing = false;
             textBox.innerHTML = text; // show full text
+            skipHint.remove();
             if (callback) callback();
         }
     }
 
     document.addEventListener("keydown", skipListener, { once: true });
 }
-
-    // SHOW CHOICES
-    function showChoices(choices) {
-        choicesDiv.innerHTML = "";
-        choices.forEach(choice => {
-            const btn = document.createElement("button");
-            btn.textContent = choice.text;
-            btn.className = "choice-btn";
-            btn.onclick = () => choice.action();
-            choicesDiv.appendChild(btn);
-        });
-    }
-
     // -------------------- SCENES --------------------
 
     function scene1() {
@@ -157,4 +155,3 @@ Gunfire erupts. People scatter. What do you do?`,
         choicesDiv.innerHTML = "";
     }
 
-});
