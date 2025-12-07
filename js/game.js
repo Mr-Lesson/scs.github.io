@@ -157,8 +157,8 @@ document.addEventListener("DOMContentLoaded", () => {
 const scene1Visual = () => { 
     clearScene(); 
     drawPixelBackground(); 
-    drawPixelCharacter(100,200,"#4AC",true,true,true,16); // Player
-    drawPixelCharacter(300,200,"#6F4",true,false,true,16); // NPC1
+    drawPixelCharacter(100,200,"#4AC",true,true,true,12); // Player
+    drawPixelCharacter(300,200,"#6F4",true,false,true,12); // NPC1
     drawPixelHouse(500,220,60,60,8); 
     drawPixelTree(650,200,8); 
 }
@@ -166,8 +166,8 @@ const scene1Visual = () => {
 const scene2Visual = () => { 
     clearScene(); 
     drawPixelBackground(); 
-    drawPixelCharacter(120,200,"#4AC",true,true,true,16); // Player
-    drawPixelCharacter(320,200,"#B85",true,false,true,16); // NPC2
+    drawPixelCharacter(120,200,"#4AC",true,true,true,12); // Player
+    drawPixelCharacter(320,200,"#B85",true,false,true,12); // NPC2
     drawPixelHouse(450,220,70,60,8); 
     drawPixelTent(650,250,8); 
     drawPixelTree(300,220,8); 
@@ -176,8 +176,8 @@ const scene2Visual = () => {
 const npc3Visual = () => { 
     clearScene(); 
     drawPixelBackground(); 
-    drawPixelCharacter(120,200,"#4AC",true,true,true,16); // Player
-    drawPixelCharacter(320,200,"#E96",true,false,true,16); // NPC3
+    drawPixelCharacter(120,200,"#4AC",true,true,true,12); // Player
+    drawPixelCharacter(320,200,"#E96",true,false,true,12); // NPC3
     drawPixelTree(400,220,8); 
     drawPixelTent(600,250,8); 
 }
@@ -185,7 +185,7 @@ const npc3Visual = () => {
 const scene3Visual = () => { 
     clearScene(); 
     drawPixelBackground(); 
-    drawPixelCharacter(150,200,"#4AC",true,true,true,16); // Player
+    drawPixelCharacter(150,200,"#4AC",true,true,true,12); // Player
     drawPixelHouse(400,220,50,50,8); 
     drawPixelTree(550,200,8); 
     drawPixelTent(600,250,8); 
@@ -194,8 +194,8 @@ const scene3Visual = () => {
 const scene4NormalVisual = () => { 
     clearScene(); 
     drawPixelBackground(); 
-    drawPixelCharacter(130,200,"#4AC",true,true,true,16); // Player
-    drawPixelCharacter(210,200,"#B85",true,false,true,16); // NPC2
+    drawPixelCharacter(130,200,"#4AC",true,true,true,12); // Player
+    drawPixelCharacter(210,200,"#B85",true,false,true,12); // NPC2
     drawPixelHouse(420,220,60,50,8); 
     drawPixelTree(580,200,8); 
     drawPixelTent(650,250,8); 
@@ -204,8 +204,8 @@ const scene4NormalVisual = () => {
 const scene4NPC1FollowupVisual = () => { 
     clearScene(); 
     drawPixelBackground(); 
-    drawPixelCharacter(110,200,"#4AC",true,true,true,16); // Player
-    drawPixelCharacter(180,200,"#C84",true,false,true,16); // NPC1
+    drawPixelCharacter(110,200,"#4AC",true,true,true,12); // Player
+    drawPixelCharacter(180,200,"#C84",true,false,true,12); // NPC1
     drawPixelHouse(400,220,60,60,8); 
     drawPixelTree(550,200,8); 
     drawPixelTent(600,250,8); 
@@ -214,8 +214,8 @@ const scene4NPC1FollowupVisual = () => {
 const battleVisual = () => { 
     clearScene(); 
     drawPixelBackground(); 
-    drawPixelCharacter(100,200,"#4AC",true,true,true,16); // Player
-    drawPixelCharacter(200,200,"#6F4",true,false,true,16); // NPC1
+    drawPixelCharacter(100,200,"#4AC",true,true,true,12); // Player
+    drawPixelCharacter(200,200,"#6F4",true,false,true,12); // NPC1
     drawPixelHouse(450,220,60,60,8); 
     drawPixelTree(600,200,8); 
     drawPixelTent(650,250,8); 
@@ -224,7 +224,7 @@ const battleVisual = () => {
 const finalVisual = () => { 
     clearScene(); 
     drawPixelBackground(); 
-    drawPixelCharacter(150,200,"#4AC",true,true,true,16); // Player
+    drawPixelCharacter(150,200,"#4AC",true,true,true,12); // Player
     drawPixelTree(500,200,8); 
     drawPixelTent(600,250,8); 
 }
