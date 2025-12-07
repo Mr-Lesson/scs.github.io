@@ -1,29 +1,31 @@
-// Elements
+// ======== ELEMENTS ========
 const startBtn = document.getElementById("start-btn");
 const titleScreen = document.getElementById("title-screen");
 const gameScreen = document.getElementById("game-screen");
 const textBox = document.getElementById("text-box");
 const choicesDiv = document.getElementById("choices");
 
-// Start button
+// ======== START BUTTON ========
 startBtn.addEventListener("click", () => {
     titleScreen.style.display = "none";
     gameScreen.style.display = "block";
     scene1();
 });
 
-// ======== TYPEWRITER SYSTEM WITH SKIP ========
+// ======== TYPEWRITER WITH ENTER SKIP ========
 let typing = false;
+let skipCallback = null;
 
 function typeText(text, callback) {
     textBox.innerHTML = "";
     choicesDiv.innerHTML = "";
-
     typing = true;
+    skipCallback = callback;
+
     let i = 0;
     const speed = 20;
 
-    // Add skip hint outside the main text
+    // Show skip hint
     let skipHint = document.createElement("div");
     skipHint.style.fontSize = "14px";
     skipHint.style.opacity = "0.7";
@@ -33,36 +35,34 @@ function typeText(text, callback) {
     textBox.appendChild(skipHint);
 
     function type() {
-        if (i < text.length && typing) {
+        if (!typing) return; // stop if skipped
+        if (i < text.length) {
             textBox.innerHTML = text.substring(0, i + 1);
             i++;
             setTimeout(type, speed);
         } else {
-            typing = false;
-            if (document.getElementById("skip-hint")) {
-                skipHint.remove();
-            }
-            if (callback) callback();
+            finishTyping();
         }
+    }
+
+    function finishTyping() {
+        typing = false;
+        if (document.getElementById("skip-hint")) skipHint.remove();
+        if (callback) callback();
     }
 
     type();
-
-    function handleSkip(e) {
-        if (e.key === "Enter" && typing) {
-            typing = false;
-            textBox.innerHTML = text;
-            if (document.getElementById("skip-hint")) {
-                skipHint.remove();
-            }
-            if (callback) callback();
-        }
-    }
-
-    document.addEventListener("keydown", handleSkip, { once: true });
 }
 
-// ======== SHOW CHOICES ========
+// Listen for Enter to skip typing
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && typing) {
+        typing = false;
+        if (skipCallback) skipCallback();
+    }
+});
+
+// ======== CHOICES ========
 function showChoices(choices) {
     choicesDiv.innerHTML = "";
     choices.forEach(choice => {
@@ -75,8 +75,6 @@ function showChoices(choices) {
 }
 
 // ======== SCENES ========
-
-// Scene 1
 function scene1() {
     typeText(
 `The year is 1851. Mexico has just lost the war, and the United States has taken California.
@@ -94,7 +92,6 @@ Here, they say the land is free. You think it'll be free for someone like me?"`,
     });
 }
 
-// Scene 2
 function scene2() {
     typeText(
 `You reach a river valley crowded with tents and rough shacks.
@@ -111,7 +108,6 @@ NPC2: "The name’s NPC2. State paid us per head to keep settlers safe."`,
     });
 }
 
-// Scene NPC3
 function sceneNPC3() {
     typeText(
 `A Maidu woman approaches carrying baskets.
@@ -126,7 +122,6 @@ and turned the water into mud. Will you buy something from us?"`,
     });
 }
 
-// Scene 3
 function scene3() {
     typeText(
 `You find a place to claim, but your gold search fails. Night falls.
@@ -145,7 +140,6 @@ NPC1 watches, expecting your response.`,
     });
 }
 
-// Scene 4
 function scene4() {
     typeText(
 `Evening outside the saloon. NPC2 reads a notice about an expedition.
@@ -159,7 +153,6 @@ NPC2: "Player. You're standing on land men like us cleared. Are you riding with 
     });
 }
 
-// Scene Battle
 function sceneBattle() {
     typeText(
 `Dawn. You ride into the hills. Camp found.
@@ -173,8 +166,7 @@ Gunfire erupts. People scatter. What do you do?`,
     });
 }
 
-// End Game
 function endGame(message) {
-    typeText(`${message}\n\n=== END OF GAME ===`);
+    textBox.innerHTML = message + "\n\n=== END OF GAME ===";
     choicesDiv.innerHTML = "";
 }
