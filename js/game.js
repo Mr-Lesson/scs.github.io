@@ -18,12 +18,27 @@ let waitingForEnter = false;
 let nextLineCallback = null;
 
 // =========================
+// CANVAS SETUP
+// =========================
+canvas.width = 800;
+canvas.height = 400;
+ctx.fillStyle = "#000"; // default black lines
+ctx.strokeStyle = "#000";
+ctx.lineWidth = 2;
+
+// Clear canvas function
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// =========================
 // SKIP HINT
 // =========================
 const skipHint = document.createElement("p");
 skipHint.id = "skip-hint";
 skipHint.style.fontSize = "14px";
 skipHint.style.color = "#d4aa70";
+skipHint.style.marginTop = "5px";
 skipHint.innerText = "Press Enter to skip/continue";
 skipHint.style.display = "none";
 gameScreen.appendChild(skipHint);
@@ -35,9 +50,13 @@ function hideSkipHint() { skipHint.style.display = "none"; }
 // START GAME
 // =========================
 startBtn.addEventListener("click", () => {
+    if (!titleScreen || !gameScreen) return;
     titleScreen.style.display = "none";
     gameScreen.style.display = "block";
-    scene1();
+
+    clearCanvas(); // clear canvas for first scene
+    showSkipHint();
+    // start your first scene here, e.g. scene1();
 });
 
 // =========================
@@ -49,8 +68,8 @@ function typeText(text, callback) {
     waitingForEnter = false;
     textBox.innerHTML = "";
 
-    hideChoices(); 
-    showSkipHint(); 
+    hideChoices(); // hide choices while typing
+    showSkipHint();
 
     let i = 0;
     const speed = 25;
@@ -73,6 +92,7 @@ function typeText(text, callback) {
             nextLineCallback = callback;
         }
     }
+
     type();
 }
 
@@ -80,9 +100,10 @@ function typeText(text, callback) {
 // CHOICES
 // =========================
 function showChoices(choices) {
-    hideSkipHint(); 
-    waitingForEnter = false; 
+    hideSkipHint(); // hide hint during choices
+    waitingForEnter = false;
     choicesDiv.innerHTML = "";
+
     choices.forEach(choice => {
         const btn = document.createElement("button");
         btn.textContent = choice.text;
@@ -97,20 +118,21 @@ function showChoices(choices) {
 function hideChoices() { choicesDiv.innerHTML = ""; }
 
 // =========================
-// ENTER HANDLER
+// ENTER KEY HANDLER
 // =========================
 document.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
         if (typing) {
-            skipTyping = true;
+            skipTyping = true; // skip current text
         } else if (waitingForEnter && nextLineCallback) {
             const cb = nextLineCallback;
             nextLineCallback = null;
             waitingForEnter = false;
-            cb();
+            cb(); // go to next line
         }
     }
 });
+
 
 // =========================
 // CANVAS DRAWING
