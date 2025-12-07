@@ -52,7 +52,7 @@ function typeText(text, callback) {
             typing = false;
             waitingForNext = true;
             hideSkipHint();
-            currentCallback = callback;
+            currentCallback = callback; // now waits for Enter to continue
         }
     }
     type();
@@ -110,16 +110,18 @@ function playLines(lines, nextScene) {
     function nextLine() {
         if (i < lines.length) {
             const line = lines[i];
-            currentCallback = () => nextLine();
-            typeText(line, null);
             i++;
+            currentCallback = nextLine; // assign Enter callback
+            typeText(line, currentCallback); // callback is not auto-called
         } else {
             currentCallback = null;
-            nextScene();
+            nextScene(); // all lines done, show choices
         }
     }
+
     nextLine();
 }
+
 
 // =========================
 // SCENES
