@@ -1,19 +1,28 @@
+/* =========================
+   GLOBAL VISUALS
+========================= */
 body {
     background-color: #1a1a1a;
     color: #f2e6c9;
-    font-family: "Georgia", serif;
+    font-family: Georgia, serif;
     margin: 0;
     text-align: center;
 }
 
+/* =========================
+   TITLE SCREEN
+========================= */
 #title-screen {
     height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
 }
 
+/* =========================
+   BUTTON UI
+========================= */
 button {
     background: #b38b4d;
     color: white;
@@ -22,33 +31,48 @@ button {
     margin: 6px;
     font-size: 18px;
     cursor: pointer;
-    transition: .3s;
+    transition: .25s;
     border-radius: 4px;
 }
-
 button:hover {
     background: #d4aa70;
 }
 
+/* =========================
+   GAME SCREEN LAYOUT
+========================= */
 #game-screen {
     display: none;
-    margin-top: 40px;
-    width: 70%;
-    margin-left: auto;
-    margin-right: auto;
+    width: 75%;
+    margin: 40px auto;
 }
 
+/* =========================
+   TEXT + CHOICE BOX
+========================= */
 #text-box {
     font-size: 20px;
     text-align: left;
     line-height: 1.6;
-    min-height: 200px;
+    min-height: 170px;
     padding: 20px;
     border-left: 4px solid #d4aa70;
+    margin-bottom: 20px;
 }
 
 #choices button {
     display: block;
-    margin: 12px auto;
+    margin: 10px auto;
     width: 60%;
+}
+
+/* =========================
+   CANVAS DISPLAY
+========================= */
+#scene-canvas {
+    margin-top: 25px;
+    width: 800px;
+    height: 400px;
+    background: #0f0f0f;
+    border: 2px solid #d4aa70;
 }

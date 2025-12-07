@@ -450,3 +450,4 @@ function endGame(message){
     hideChoices();
     clearScene();
 }
+});
