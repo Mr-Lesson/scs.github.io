@@ -25,18 +25,30 @@
 <!-- ======================
         GAME UI
 ======================= -->
-<div id="game-screen">
+<div id="game-screen" style="display:none; text-align:center;">
 
-    <!-- TEXT OUTPUT -->
-    <div id="text-box"></div>
+    <!-- CANVAS VISUALS (Top) -->
+    <canvas id="scene-canvas" width="800" height="400" style="border:2px solid #d4aa70; background:#0f0f0f;"></canvas>
+
+    <!-- TEXT OUTPUT (Below Canvas) -->
+    <div id="text-box" style="
+        margin-top:10px;
+        font-family: Georgia, serif;
+        font-size:18px;
+        color:#f2e6c9;
+        text-align:left;
+        width:75%;
+        margin-left:auto;
+        margin-right:auto;
+        min-height:120px;
+        border-left:4px solid #d4aa70;
+        padding:15px;
+        background: rgba(0,0,0,0.3);
+        border-radius:4px;
+    "></div>
 
     <!-- PLAYER CHOICES -->
-    <div id="choices"></div>
-
-    <!-- CANVAS VISUALS -->
-    <canvas id="scene-canvas"></canvas>
-
+    <div id="choices" style="margin-top:10px;"></div>
 </div>
-
 </body>
 </html>
