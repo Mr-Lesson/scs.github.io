@@ -15,22 +15,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // TYPEWRITER EFFECT
     function typeText(text, callback) {
-        textBox.innerHTML = "";
-        choicesDiv.innerHTML = ""; // hide choices while typing
-        let i = 0;
-        const speed = 32; // typing speed in ms
+    textBox.innerHTML = "";
+    choicesDiv.innerHTML = ""; // hide choices while typing
 
-        function type() {
-            if (i < text.length) {
-                textBox.innerHTML += text.charAt(i);
-                i++;
-                setTimeout(type, speed);
-            } else if (callback) {
-                callback();
-            }
+    let i = 0;
+    const speed = 12; // faster
+    let typing = true;
+
+    function type() {
+        if (i < text.length) {
+            textBox.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(type, speed);
+        } else {
+            typing = false;
+            if (callback) callback();
         }
-        type();
     }
+
+    type();
+
+    // Listen for Enter to skip
+    function skipListener(e) {
+        if (e.key === "Enter" && typing) {
+            typing = false;
+            textBox.innerHTML = text; // show full text
+            if (callback) callback();
+        }
+    }
+
+    document.addEventListener("keydown", skipListener, { once: true });
+}
 
     // SHOW CHOICES
     function showChoices(choices) {
