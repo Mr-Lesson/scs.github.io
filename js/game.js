@@ -75,6 +75,7 @@ function typeText(text, callback) {
 }
 
 function showChoices(choices) {
+    hideSkipHint();
     choicesDiv.innerHTML = "";
     choices.forEach(choice => {
         const btn = document.createElement("button");
