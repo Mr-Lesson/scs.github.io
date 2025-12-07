@@ -136,7 +136,6 @@ function scene1() {
     nextLine();
 }
 
-// Scene 2
 function scene2() {
     const lines = [
         "After some time, you finally reach a river valley crowded with tents and rough shacks. You see the Gold Rush in full swing: Americans from the East, European fortune seekers, Chilean and Sonoran miners, Kankakas from the Pacific, and Chinese laborers work the banks.",
@@ -162,7 +161,6 @@ function scene2() {
     nextLine();
 }
 
-// Scene NPC3
 function sceneNPC3() {
     const lines = [
         "As you examine the banks, a small group approaches. At their head walks a Maidu woman, carrying woven baskets. You see those behind her carrying items from around the river.",
@@ -186,7 +184,6 @@ function sceneNPC3() {
     nextLine();
 }
 
-// Scene 3
 function scene3() {
     const lines = [
         "Having finally found a place to claim, you begin trying to find gold, but fail. As night falls, you head to the small settlement put together for those searching for gold. You eat and fall asleep, thinking about NPC3.",
@@ -214,7 +211,6 @@ function scene3() {
     nextLine();
 }
 
-// Scene 4 Normal
 function scene4Normal() {
     typeText("Evening outside the saloon. NPC2 reads a notice about an expedition.", () => {
         showChoices([
@@ -225,7 +221,6 @@ function scene4Normal() {
     });
 }
 
-// Scene 4 NPC1 followup
 function scene4NPC1Followup() {
     typeText("NPC1 approaches you later that day, covered in scratches and bruises.", () => {
         showChoices([
@@ -236,7 +231,6 @@ function scene4NPC1Followup() {
     });
 }
 
-// Scene Battle
 function sceneBattle() {
     const lines = [
         "At dawn, you ride into the hills with NPC1 and several others. You find the camp filled with small shelters.",
@@ -251,40 +245,37 @@ function sceneBattle() {
             i++;
         } else {
             showChoices([
-                { text: "Fire at a fleeing figure", response: "The camp is destroyed. NPC1 praises your effort. You win a sizeable bounty.", action: finalScene },
-                { text: "Fire and purposefully miss", response: "The camp is destroyed. NPC1 is upset. No reward.", action: finalScene },
-                { text: "Shield someone physically", response: "A few are saved. NPC1 is upset. Punishment promised.", action: finalScene }
+                { text: "Fire at a fleeing figure", response: "The camp is destroyed and burnt down. NPC1 praises your effort. You win a sizeable bounty.", action: finalScene },
+                { text: "Fire and purposefully miss", response: "Same destruction occurs. NPC1 is upset and you receive no reward.", action: finalScene },
+                { text: "Shield someone physically", response: "A few are saved. NPC1 is extremely upset and promises punishment.", action: finalScene }
             ]);
         }
     }
     nextLine();
 }
 
-// Final Reflection
 function finalScene() {
-    const lines = [
+    const reflectionLines = [
         "Fast forward to 1855, the gold is all but gone.",
         "You get an opportunity to talk to NPC1 and reflect on the choices you made.",
-        "NPC1: Based on your actions, here’s what I think about how we all navigated these times..."
+        'NPC1: "Based on your actions, here’s what I think about how we all navigated these times..."'
     ];
 
     let i = 0;
-    function nextLine() {
-        if (i < lines.length) {
-            nextLineCallback = nextLine;
-            typeText(lines[i], nextLine);
+    function nextReflection() {
+        if (i < reflectionLines.length) {
+            nextLineCallback = nextReflection;
+            typeText(reflectionLines[i], nextReflection);
             i++;
         } else {
             endGame("=== THE END ===");
         }
     }
-    nextLine();
+    nextReflection();
 }
 
-// End Game
 function endGame(message) {
     typeText(message);
     hideChoices();
-    // hide skip hint only when game ends
     nextLineCallback = null;
 }
