@@ -5,16 +5,20 @@ const gameScreen = document.getElementById("game-screen");
 const textBox = document.getElementById("text-box");
 const choicesDiv = document.getElementById("choices");
 
-// ======== START BUTTON ========
-startBtn.addEventListener("click", () => {
-    titleScreen.style.display = "none";
-    gameScreen.style.display = "block";
-    scene1();
-});
-
-// ======== TYPEWRITER WITH ENTER SKIP ========
 let typing = false;
 let skipCallback = null;
+
+// Create skip hint element once
+let skipHint = document.createElement("div");
+skipHint.id = "skip-hint";
+skipHint.style.fontSize = "14px";
+skipHint.style.opacity = "0.8";
+skipHint.style.marginTop = "10px";
+skipHint.style.textAlign = "center";
+skipHint.style.color = "#d4aa70"; // match theme
+skipHint.textContent = "Press Enter to skip...";
+skipHint.style.display = "none"; // hidden initially
+textBox.parentElement.appendChild(skipHint);
 
 // Handle Enter key to skip
 document.addEventListener("keydown", (e) => {
@@ -31,21 +35,10 @@ function typeText(text, callback) {
     typing = true;
     skipCallback = callback;
 
+    skipHint.style.display = "block"; // show hint
+
     let i = 0;
     const speed = 20;
-
-    // Add skip hint
-    let skipHint = document.getElementById("skip-hint");
-    if (!skipHint) {
-        skipHint = document.createElement("div");
-        skipHint.id = "skip-hint";
-        skipHint.style.fontSize = "14px";
-        skipHint.style.opacity = "0.7";
-        skipHint.style.marginTop = "10px";
-        skipHint.style.textAlign = "center";
-        skipHint.textContent = "Press Enter to skip...";
-        textBox.parentElement.appendChild(skipHint);
-    }
 
     function type() {
         if (!typing) return finishTyping();
@@ -60,7 +53,7 @@ function typeText(text, callback) {
 
     function finishTyping() {
         typing = false;
-        skipHint.remove();
+        skipHint.style.display = "none"; // hide hint
         textBox.innerHTML = text; // ensure full text is displayed
         if (callback) callback();
     }
@@ -68,16 +61,24 @@ function typeText(text, callback) {
     type();
 }
 
-// ======== CHOICES ========
+// Show choices
 function showChoices(choices) {
     choicesDiv.innerHTML = "";
     choices.forEach(choice => {
         const btn = document.createElement("button");
         btn.textContent = choice.text;
         btn.className = "choice-btn";
-        btn.onclick = choice.action;
+        btn.onclick = () => choice.action();
         choicesDiv.appendChild(btn);
     });
+}
+
+// Start game
+document.getElementById("start-btn").onclick = startGame;
+function startGame() {
+    document.getElementById("title-screen").style.display = "none";
+    document.getElementById("game-screen").style.display = "block";
+    scene1();
 }
 
 // ======== SCENES ========
