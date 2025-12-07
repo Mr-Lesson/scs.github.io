@@ -25,6 +25,10 @@ let nextLineCallback = null;
 canvas.width = 800;
 canvas.height = 400;
 
+function clearScene() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
 // =========================
 // SKIP HINT
 // =========================
@@ -116,143 +120,73 @@ document.addEventListener("keydown",e=>{
 });
 
 // =========================
-// RUSTIC DRAWING FUNCTIONS
+// DRAWING FUNCTIONS
 // =========================
-function clearScene() { ctx.clearRect(0,0,canvas.width,canvas.height); }
-
-function valley() {
-    const skyGradient = ctx.createLinearGradient(0,0,0,400);
-    skyGradient.addColorStop(0,"#cce6ff");
-    skyGradient.addColorStop(1,"#a3d9a5");
-    ctx.fillStyle = skyGradient;
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    ctx.fillStyle = "#2d5d2b";
+function drawStick(x,y,color="white"){
+    ctx.strokeStyle=color; ctx.lineWidth=3;
+    // head
+    ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.stroke();
+    // body
+    ctx.beginPath(); ctx.moveTo(x,y+10); ctx.lineTo(x,y+50); ctx.stroke();
+    // arms
+    ctx.beginPath(); ctx.moveTo(x-15,y+25); ctx.lineTo(x+15,y+35); ctx.stroke();
+    // legs
     ctx.beginPath();
-    ctx.moveTo(0,350);
-    ctx.bezierCurveTo(100,320,200,360,300,340);
-    ctx.bezierCurveTo(400,320,500,360,600,330);
-    ctx.bezierCurveTo(700,310,800,350,800,400);
-    ctx.lineTo(0,400);
+    ctx.moveTo(x,y+50); ctx.lineTo(x-15,y+70);
+    ctx.moveTo(x,y+50); ctx.lineTo(x+15,y+70);
+    ctx.stroke();
+}
+
+function drawHouse(x,y,w,h){
+    // walls
+    ctx.fillStyle="#653";
+    ctx.fillRect(x,y,w,h);
+    // roof
+    ctx.beginPath();
+    ctx.moveTo(x,y); 
+    ctx.lineTo(x+w/2, y-h/2); 
+    ctx.lineTo(x+w,y);
     ctx.closePath();
+    ctx.fillStyle="#922";
     ctx.fill();
-
-    for(let i=0;i<150;i++){
-        ctx.fillStyle = `rgba(0,0,0,${Math.random()*0.05})`;
-        ctx.fillRect(Math.random()*800, 340+Math.random()*60, 2, 2);
-    }
-}
-
-function drawStick(x, y, color="white") {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(x + (Math.random()*2-1), y + (Math.random()*2-1), 10 + Math.random()*1.5, 0, Math.PI*2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x + 2, y + 10);
-    ctx.lineTo(x + 2 + (Math.random()*2-1), y + 42 + (Math.random()*2-1));
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x-12, y+22);
-    ctx.lineTo(x+12 + (Math.random()*2-1), y+18 + (Math.random()*2-1));
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x+2, y+42);
-    ctx.lineTo(x-12 + (Math.random()*2-1), y+62 + (Math.random()*2-1));
-    ctx.moveTo(x+2, y+42);
-    ctx.lineTo(x+15 + (Math.random()*2-1), y+60 + (Math.random()*2-1));
-    ctx.stroke();
-}
-
-function drawHouse(x, y, w, h) {
-    ctx.fillStyle = "#7a4b2b";
-    ctx.fillRect(x, y, w, h);
-    ctx.beginPath();
-    ctx.moveTo(x-2, y);
-    ctx.lineTo(x + w/2 + (Math.random()*5-2), y - h/2 - 5 + (Math.random()*3-1));
-    ctx.lineTo(x+w+3, y + 2 + (Math.random()*2-1));
-    ctx.closePath();
-    ctx.fillStyle = "#8b2c1a";
-    ctx.fill();
-    ctx.fillStyle = "#331d0f";
-    ctx.fillRect(x + w/3 + (Math.random()*2-1), y + h/2, w/4, h/2);
-    ctx.fillStyle = "#e6f2ff";
-    if(Math.random() > 0.3) ctx.fillRect(x + 5, y + 10, 10, 10);
-    if(Math.random() > 0.5) ctx.fillRect(x + w - 15, y + 15, 10, 10);
-}
-
-function drawTree(x, y, type="oak") {
-    ctx.fillStyle = "#4b2e1e";
-    ctx.fillRect(x, y, 10 + Math.random()*3, 30 + Math.random()*5);
-    if(type === "oak") {
-        ctx.fillStyle = "#2d702b";
+    // roof texture
+    ctx.strokeStyle="#511";
+    for(let i=0;i<w;i+=5){
         ctx.beginPath();
-        ctx.arc(x+5, y, 20 + Math.random()*5, 0, Math.PI*2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(x+15, y-5, 15 + Math.random()*4, 0, Math.PI*2);
-        ctx.fill();
-    } else {
-        ctx.fillStyle = "#1e5d1e";
-        ctx.beginPath();
-        ctx.moveTo(x-15, y+30);
-        ctx.lineTo(x+20, y+30);
-        ctx.lineTo(x+5, y-10);
-        ctx.closePath();
-        ctx.fill();
-    }
-}
-
-function drawFence(x, y, segments=5) {
-    ctx.strokeStyle = "#543210";
-    ctx.lineWidth = 2;
-    for(let i=0;i<segments;i++){
-        ctx.beginPath();
-        ctx.moveTo(x + i*20 + (Math.random()*2-1), y);
-        ctx.lineTo(x + i*20 + (Math.random()*2-1), y-20 - Math.random()*3);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x + i*20, y-10 + (Math.random()*2-1));
-        ctx.lineTo(x + (i+1)*20, y-10 + (Math.random()*2-1));
+        ctx.moveTo(x+i, y-(h/2)*(i/w));
+        ctx.lineTo(x+i+2, y-(h/2)*(i/w));
         ctx.stroke();
     }
 }
 
-function drawGoldPan(x, y) {
-    ctx.fillStyle = "#999";
-    ctx.beginPath();
-    ctx.ellipse(x, y, 10, 4, 0, 0, Math.PI*2);
-    ctx.fill();
-    ctx.strokeStyle = "#666";
-    ctx.stroke();
-}
-
-function drawPickaxe(x, y) {
-    ctx.strokeStyle = "#5a3a1e";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x+10, y-20);
-    ctx.lineTo(x+12, y-18);
-    ctx.stroke();
+function valley(){
+    ctx.fillStyle="#083";
+    ctx.fillRect(0,300,800,50);
+    // grass lines
+    ctx.strokeStyle="#064";
+    for(let i=0;i<800;i+=15){
+        ctx.beginPath();
+        ctx.moveTo(i,300);
+        ctx.lineTo(i+7, 290);
+        ctx.stroke();
+    }
 }
 
 // =========================
-// SCENES VISUALS
+// SCENE VISUALS
 // =========================
-const scene1Visual=()=>{clearScene(); valley(); drawTree(400,300); drawFence(50,340,6); drawStick(90,260,"#4ac"); drawStick(150,260,"#6f4"); drawHouse(300,280,60,60); drawGoldPan(200,365); drawPickaxe(220,360);}
-const scene2Visual=()=>{clearScene(); valley(); drawTree(500,280,"pine"); drawStick(90,260,"#4ac"); drawStick(160,260,"#b85"); drawHouse(260,285,70,60); drawFence(100,340,4);}
-const npc3Visual =()=>{clearScene(); valley(); drawTree(350,290); drawStick(90,260,"#4ac"); drawStick(150,260,"#e96");}
-const scene3Visual=()=>{clearScene(); valley(); drawTree(400,300); drawStick(120,260,"#4ac"); drawHouse(310,290,50,50);}
-const saloonVisual=()=>{clearScene(); valley(); drawTree(420,280); drawStick(110,260,"#4ac"); drawStick(180,260,"#b85"); drawHouse(300,285,60,60);}
-const battleVisual=()=>{clearScene(); valley(); drawTree(450,300); drawStick(90,260,"#4ac"); drawStick(170,260,"#6f4"); drawHouse(320,285,60,60); drawGoldPan(350,365);}
-const npc4Visual =()=>{clearScene(); valley(); drawTree(380,300); drawStick(90,260,"#4ac"); drawStick(150,260,"#c84"); drawHouse(300,290,60,60);}
-const finalVisual =()=>{clearScene(); valley(); drawTree(400,300); drawStick(120,260,"#4ac");}
+const scene1Visual = ()=>{ clearScene(); valley(); drawStick(90,150,"#4ac"); drawStick(150,150,"#6f4"); drawHouse(300,180,60,60); };
+const scene2Visual = ()=>{ clearScene(); valley(); drawStick(90,150,"#4ac"); drawStick(160,150,"#b85"); drawHouse(260,175,70,60); };
+const npc3Visual   = ()=>{ clearScene(); valley(); drawStick(90,150,"#4ac"); drawStick(150,150,"#e96"); };
+const scene3Visual = ()=>{ clearScene(); valley(); drawStick(120,150,"#4ac"); drawHouse(310,180,50,50); };
+const saloonVisual = ()=>{ clearScene(); valley(); drawStick(110,150,"#4ac"); drawStick(180,150,"#b85"); };
+const battleVisual = ()=>{ clearScene(); valley(); drawStick(90,150,"#4ac"); drawStick(170,150,"#6f4"); drawHouse(320,175,60,60); };
+const npc4Visual   = ()=>{ clearScene(); valley(); drawStick(90,150,"#4ac"); drawStick(150,150,"#c84"); drawHouse(300,180,60,60); };
+const finalVisual  = ()=>{ clearScene(); valley(); drawStick(120,150,"#4ac"); };
+
 // =========================
 // GAME SCENES
 // =========================
-
 function scene1() {
     scene1Visual();
     const lines = [
@@ -266,8 +200,8 @@ function scene1() {
     ];
     let i = 0;
     function nextLine() {
-        if (i < lines.length) {
-            nextLineCallback = nextLine;
+        if(i<lines.length){
+            nextLineCallback=nextLine;
             typeText(lines[i], nextLine);
             i++;
         } else {
@@ -288,10 +222,10 @@ function scene2() {
         "The hills bear scars where hydraulic hoses and picks have torn the soil...",
         'NPC2: "The name’s NPC2. When I rode in ‘49, this valley was full of camps..."'
     ];
-    let i = 0;
+    let i=0;
     function nextLine() {
-        if (i < lines.length) {
-            nextLineCallback = nextLine;
+        if(i<lines.length){
+            nextLineCallback=nextLine;
             typeText(lines[i], nextLine);
             i++;
         } else {
@@ -311,10 +245,10 @@ function sceneNPC3() {
         "As you examine the banks, a small group approaches...",
         'NPC3: "Hello, I am NPC3. The men who came before you cut down our oaks..."'
     ];
-    let i = 0;
+    let i=0;
     function nextLine() {
-        if (i < lines.length) {
-            nextLineCallback = nextLine;
+        if(i<lines.length){
+            nextLineCallback=nextLine;
             typeText(lines[i], nextLine);
             i++;
         } else {
@@ -337,10 +271,10 @@ function scene3() {
         "Judge: 'Your claim lacks the survey and documentation required by the Land Act of 1851...'",
         "NPC1 looks to you, almost expecting you to say something."
     ];
-    let i = 0;
+    let i=0;
     function nextLine() {
-        if (i < lines.length) {
-            nextLineCallback = nextLine;
+        if(i<lines.length){
+            nextLineCallback=nextLine;
             typeText(lines[i], nextLine);
             i++;
         } else {
@@ -362,14 +296,14 @@ function scene4Normal() {
     ];
     let i = 0;
     function nextLine() {
-        if (i < lines.length) {
-            nextLineCallback = nextLine;
+        if(i<lines.length){
+            nextLineCallback=nextLine;
             typeText(lines[i], nextLine);
             i++;
         } else {
             showChoices([
                 { text: "Join fully", response: "You join the expedition fully.", action: sceneBattle },
-                { text: "Refuse", response: "You refuse. Nothing changes today.", action: () => endGame("You refused the expedition. Nothing changes today.") },
+                { text: "Refuse", response: "You refuse. Nothing changes today.", action: ()=>endGame("You refused the expedition. Nothing changes today.") },
                 { text: "Join but won’t shoot unless needed", response: "You join but promise to avoid killing unless necessary.", action: sceneBattle }
             ]);
         }
@@ -384,8 +318,8 @@ function scene4NPC1Followup() {
     ];
     let i = 0;
     function nextLine() {
-        if (i < lines.length) {
-            nextLineCallback = nextLine;
+        if(i<lines.length){
+            nextLineCallback=nextLine;
             typeText(lines[i], nextLine);
             i++;
         } else {
@@ -407,8 +341,8 @@ function sceneBattle() {
     ];
     let i = 0;
     function nextLine() {
-        if (i < lines.length) {
-            nextLineCallback = nextLine;
+        if(i<lines.length){
+            nextLineCallback=nextLine;
             typeText(lines[i], nextLine);
             i++;
         } else {
@@ -431,8 +365,8 @@ function finalScene() {
     ];
     let i = 0;
     function nextReflection() {
-        if (i < reflectionLines.length) {
-            nextLineCallback = nextReflection;
+        if(i<reflectionLines.length){
+            nextLineCallback=nextReflection;
             typeText(reflectionLines[i], nextReflection);
             i++;
         } else {
@@ -447,4 +381,5 @@ function endGame(message){
     hideChoices();
     clearScene();
 }
+
 });
