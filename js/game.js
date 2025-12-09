@@ -200,12 +200,19 @@ document.addEventListener("DOMContentLoaded", () => {
         if(tool){ctx.fillStyle="#8a8a8a";ctx.fillRect(x+s,y+s,Math.max(3,Math.round(s*0.3)),Math.round(s*1.0))}
         if(bag){ctx.fillStyle="#8a6b42";ctx.fillRect(x-Math.round(s/2),y+s,Math.round(s/2),Math.round(s*0.8))}
     }
+    function drawJosiah(x, layer="foreground", scale=1) {
+        drawCharacter(x, "#4a2f20", "#2b8a3e", false, false, false, scale, layer);
+    }
+
+    function drawSolomon(x, layer="foreground", scale=1) {
+        drawCharacter(x, "#3a1f16", "#4a2b6b", false, false, false, scale, layer);
+    }
 
     // ---------------- Scene Visuals with adjusted positions ----------------
     function scene1Visual(){
         drawBackground();
-        drawCharacter(140,"#f1d1bb","#4a9",false,false,false,1,"foreground");
-        drawCharacter(260,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawJosiah(140,"foreground"); // Josiah
+        drawCharacter(260,"#f1d1bb","#4a9",false,false,false,1,"foreground"); // generic settler
         drawHouse(520,48,36,"foreground");
         drawTree(680,22,"hills");
         drawTree(100,22,"hills");
@@ -232,27 +239,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function scene3Visual(){
         drawBackground();
-        drawCharacter(150,"#f1d1bb","#4a9",false,false,false,1,"foreground");
-        drawHouse(400,48,36,"foreground");
+        drawJosiah(150,"foreground"); // Josiah in foreground
+        drawHouse(400,80,60,"foreground"); // courthouse
         drawTent(600,40,30,"river");
         drawTree(500,18,"hills");
     }
 
     function courthouseVisual(){
         drawCourthouseInterior();
-        drawCharacter(200,"#f1d1bb","#4a9",false,false,false,1,"foreground");
-        drawCharacter(400,"#f1d1bb","#4a9",false,false,false,1,"foreground");
-        drawCharacter(600,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawJosiah(200,"foreground");
+        drawSolomon(400,"foreground");
+        drawCharacter(600,"#f1d1bb","#4a9",false,false,false,1,"foreground"); // other NPC
     }
-
     function josiahAndSolomonVisual(){
         drawBackground();
-        drawCharacter(150,"#f1d1bb","#4a9",false,false,false,1,"foreground");
-        drawCharacter(200,"#f1d1bb","#4a9",false,false,false,1,"foreground");
-        drawCharacter(250,"#f1d1bb","#4a9",false,false,false,1,"foreground");
-        drawCharacter(300,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawJosiah(150,"foreground");
+        drawSolomon(200,"foreground");
+        drawCharacter(250,"#f1d1bb","#4a9",false,false,false,1,"foreground"); // 
+        drawCharacter(300,"#f1d1bb","#4a9",false,false,false,1,"foreground"); // 
     }
-
     function saloonVisual(){
         clearScene();
         ctx.fillStyle="#8b5e3c"; ctx.fillRect(0,0,canvas.width,canvas.height);
