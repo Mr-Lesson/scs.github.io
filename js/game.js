@@ -72,7 +72,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function clearScene() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-
+function showChoices(list)
+{ choicesDiv.innerHTML=""; hideSkipHint(); waitingForEnter=false;
+    list.forEach(c=>{ const btn=document.createElement("button"); 
+    btn.textContent=c.text; btn.onclick=()=>typeText(c.response,()=>c.action()); 
+    choicesDiv.appendChild(btn);
+     }); 
+} 
+function hideChoices(){ choicesDiv.innerHTML=""; }
     // =========================
     // BACKGROUNDS
     // =========================
