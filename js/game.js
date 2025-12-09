@@ -1,9 +1,4 @@
-// game.js
 document.addEventListener("DOMContentLoaded", () => {
-
-    // =========================
-    // ELEMENTS
-    // =========================
     const startBtn = document.getElementById("start-btn");
     const titleScreen = document.getElementById("title-screen");
     const gameScreen = document.getElementById("game-screen");
@@ -12,387 +7,43 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById("scene-canvas");
     const ctx = canvas.getContext("2d");
 
-    canvas.width = 800;
-    canvas.height = 400;
-
-    // =========================
-    // STATE
-    // =========================
-    let typing = false;
-    let skipTyping = false;
-    let waitingForEnter = false;
-    let nextLineCallback = null;
-
-    let gold = 0;
-    let morality = 0;
-    let choicesLog = [];
-
-    // =========================
-    // ART SETTINGS
-    // =========================
+    let typing = false, skipTyping = false, waitingForEnter = false, nextLineCallback = null;
+    let gold = 0, morality = 0, choicesLog = [];
     const CHAR_SIZE = 16;
+    const HUD = {x:10,y:10,width:180,height:50,padding:8,bgColor:"rgba(0,0,0,0.5)",borderColor:"#d4aa70",borderWidth:2,textColor:"#fff",font:"16px monospace"};
 
-    // =========================
-    // HUD SETTINGS
-    // =========================
-    const HUD = {
-        x: 10,
-        y: 10,
-        width: 180,
-        height: 50,
-        padding: 8,
-        bgColor: "rgba(0,0,0,0.5)",
-        borderColor: "#d4aa70",
-        borderWidth: 2,
-        textColor: "#ffffff",
-        font: "16px monospace"
-    };
+    function drawHUD(){ctx.fillStyle=HUD.bgColor;ctx.fillRect(HUD.x,HUD.y,HUD.width,HUD.height);ctx.strokeStyle=HUD.borderColor;ctx.lineWidth=HUD.borderWidth;ctx.strokeRect(HUD.x,HUD.y,HUD.width,HUD.height);ctx.fillStyle=HUD.textColor;ctx.font=HUD.font;ctx.textBaseline="top";ctx.fillText(`Gold: ${gold}`,HUD.x+HUD.padding,HUD.y+HUD.padding);ctx.fillText(`Morality: ${morality}`,HUD.x+HUD.padding,HUD.y+HUD.padding+20)}
+    function updateHUD(){drawHUD()}
+    function clearScene(){ctx.clearRect(0,0,canvas.width,canvas.height)}
+    function showChoices(l){choicesDiv.innerHTML="";hideSkipHint();waitingForEnter=false;l.forEach(c=>{const b=document.createElement("button");b.textContent=c.text;b.style.cssText="margin:5px;padding:10px 20px;font-size:16px;cursor:pointer;font-family:'Kalam',cursive;background:#3a5a40;color:#f2e6c9;border:2px solid #d4aa70;border-radius:4px;";b.onclick=()=>{hideChoices();typeText(c.response,()=>c.action())};choicesDiv.appendChild(b)})}
+    function hideChoices(){choicesDiv.innerHTML=""}
+    
+    function drawBackground(){clearScene();const g=ctx.createLinearGradient(0,0,0,canvas.height);g.addColorStop(0,"#a8d8ff");g.addColorStop(0.6,"#cfeefc");g.addColorStop(1,"#e8f7ee");ctx.fillStyle=g;ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#ffd24d";ctx.beginPath();ctx.arc(700,70,28,0,Math.PI*2);ctx.fill();ctx.fillStyle="#6a8a3f";ctx.beginPath();ctx.moveTo(0,260);ctx.quadraticCurveTo(200,200,380,260);ctx.quadraticCurveTo(520,300,800,260);ctx.lineTo(800,400);ctx.lineTo(0,400);ctx.fill();ctx.fillStyle="#3a7b2f";ctx.beginPath();ctx.moveTo(0,300);ctx.quadraticCurveTo(180,250,360,300);ctx.quadraticCurveTo(520,350,800,300);ctx.lineTo(800,400);ctx.lineTo(0,400);ctx.fill();ctx.fillStyle="#d6b98a";ctx.beginPath();ctx.moveTo(40,360);ctx.quadraticCurveTo(200,320,360,360);ctx.quadraticCurveTo(520,400,760,360);ctx.lineTo(760,390);ctx.quadraticCurveTo(520,410,360,390);ctx.quadraticCurveTo(200,370,40,390);ctx.closePath();ctx.fill();ctx.fillStyle="#4aa3ff";ctx.beginPath();ctx.moveTo(120,320);ctx.quadraticCurveTo(220,280,360,320);ctx.quadraticCurveTo(500,360,680,320);ctx.lineTo(680,360);ctx.quadraticCurveTo(500,400,360,360);ctx.quadraticCurveTo(220,320,120,360);ctx.closePath();ctx.fill();ctx.fillStyle="#79c25e";ctx.fillRect(0,360,canvas.width,40);drawHUD()}
+    function drawCourthouseInterior(){clearScene();ctx.fillStyle="#2b2317";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle="rgba(255,255,220,0.08)";ctx.fillRect(60,40,120,300);ctx.fillRect(620,40,120,300);ctx.fillStyle="#3b2d20";ctx.fillRect(260,40,280,40);ctx.fillStyle="#cfa06d";ctx.fillRect(260,80,280,10);ctx.fillStyle="#3b2d20";for(let r=0;r<3;r++)ctx.fillRect(80,120+r*40,640,18);ctx.fillStyle="#8b6b4a";ctx.fillRect(360,160,80,14);const g=ctx.createRadialGradient(400,70,10,400,70,220);g.addColorStop(0,"rgba(255,255,220,0.35)");g.addColorStop(1,"rgba(0,0,0,0)");ctx.fillStyle=g;ctx.fillRect(0,0,canvas.width,canvas.height);drawHUD()}
+    function drawTree(x,y,s=18){ctx.fillStyle="#2f7b2a";ctx.beginPath();ctx.moveTo(x,y-s);ctx.lineTo(x-s,y+s/2);ctx.lineTo(x+s,y+s/2);ctx.closePath();ctx.fill();ctx.fillStyle="#6b3e1f";ctx.fillRect(x-Math.floor(s/6),y+s/2,Math.floor(s/3),Math.floor(s/2))}
+    function drawHouse(x,y,w=48,h=36){ctx.fillStyle="#7a4a22";ctx.fillRect(x,y,w,h);ctx.fillStyle="#9b2b2b";ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w/2,y-h/2);ctx.lineTo(x+w,y);ctx.closePath();ctx.fill()}
+    function drawTent(x,y,w=40,h=30){ctx.fillStyle="#ff6b4b";ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-w/2,y+h);ctx.lineTo(x+w/2,y+h);ctx.closePath();ctx.fill();ctx.fillStyle="#a2412a";ctx.fillRect(x-2,y+h-6,4,6)}
+    function drawCharacter(x,y,skin="#f1d1bb",clothes="#4a9",hat=false,tool=false,bag=false,scale=1){const s=Math.round(CHAR_SIZE*scale);ctx.fillStyle=skin;ctx.fillRect(x,y,s,s);ctx.fillStyle=clothes;ctx.fillRect(x,y+s,s,Math.round(s*1.6));ctx.fillRect(x-Math.round(s/2),y+s,Math.round(s/2),Math.round(s*1.2));ctx.fillRect(x+s,y+s,Math.round(s/2),Math.round(s*1.2));ctx.fillRect(x,y+Math.round(s*2.6),Math.round(s/2),Math.round(s*1.4));ctx.fillRect(x+Math.round(s/2),y+Math.round(s*2.6),Math.round(s/2),Math.round(s*1.4));if(hat){ctx.fillStyle="#7a4a22";ctx.fillRect(x-Math.round(s/6),y-Math.round(s/4),Math.round(s*1.3),Math.round(s/4))}if(tool){ctx.fillStyle="#8a8a8a";ctx.fillRect(x+s,y+s,Math.max(3,Math.round(s*0.3)),Math.round(s*1.0))}if(bag){ctx.fillStyle="#8a6b42";ctx.fillRect(x-Math.round(s/2),y+s,Math.round(s/2),Math.round(s*0.8))}}
 
-    function drawHUD() {
-        ctx.fillStyle = HUD.bgColor;
-        ctx.fillRect(HUD.x, HUD.y, HUD.width, HUD.height);
-        ctx.strokeStyle = HUD.borderColor;
-        ctx.lineWidth = HUD.borderWidth;
-        ctx.strokeRect(HUD.x, HUD.y, HUD.width, HUD.height);
-        ctx.fillStyle = HUD.textColor;
-        ctx.font = HUD.font;
-        ctx.textBaseline = "top";
-        ctx.fillText(`Gold: ${gold}`, HUD.x + HUD.padding, HUD.y + HUD.padding);
-        ctx.fillText(`Morality: ${morality}`, HUD.x + HUD.padding, HUD.y + HUD.padding + 20);
-    }
+    function typeText(text,onComplete){typing=true;skipTyping=false;waitingForEnter=false;textBox.innerHTML="";hideChoices();showSkipHint();let i=0;const speed=26;function step(){if(skipTyping){textBox.innerHTML=text;finish();return}if(i<text.length){textBox.innerHTML+=text.charAt(i);i++;updateHUD();setTimeout(step,speed)}else finish()}function finish(){typing=false;waitingForEnter=true;nextLineCallback=onComplete;updateHUD()}step()}
 
-    function updateHUD() {
-        // redraw the HUD on top of the current scene
-        drawHUD();
-    }
+    const skipHint=document.createElement("p");skipHint.style.cssText="color:#d4aa70;font-size:14px;margin-top:8px;font-family:'Kalam',cursive;text-align:center;";skipHint.innerText="Press ENTER to continue";skipHint.style.display="none";
+    function showSkipHint(){skipHint.style.display="block";if(!gameScreen.contains(skipHint))gameScreen.appendChild(skipHint)}
+    function hideSkipHint(){skipHint.style.display="none"}
 
-    // =========================
-    // UTILS
-    // =========================
-    function clearScene() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-function showChoices(list)
-{ choicesDiv.innerHTML=""; hideSkipHint(); waitingForEnter=false;
-    list.forEach(c=>{ const btn=document.createElement("button"); 
-    btn.textContent=c.text; btn.onclick=()=>typeText(c.response,()=>c.action()); 
-    choicesDiv.appendChild(btn);
-     }); 
-} 
-function hideChoices(){ choicesDiv.innerHTML=""; }
-    // =========================
-    // BACKGROUNDS
-    // =========================
-    function drawBackground() {
-        clearScene();
-        const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        g.addColorStop(0, "#a8d8ff");
-        g.addColorStop(0.6, "#cfeefc");
-        g.addColorStop(1, "#e8f7ee");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#ffd24d";
-        ctx.beginPath();
-        ctx.arc(700, 70, 28, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "#6a8a3f";
-        ctx.beginPath();
-        ctx.moveTo(0, 260);
-        ctx.quadraticCurveTo(200, 200, 380, 260);
-        ctx.quadraticCurveTo(520, 300, 800, 260);
-        ctx.lineTo(800, 400);
-        ctx.lineTo(0, 400);
-        ctx.fill();
-        ctx.fillStyle = "#3a7b2f";
-        ctx.beginPath();
-        ctx.moveTo(0, 300);
-        ctx.quadraticCurveTo(180, 250, 360, 300);
-        ctx.quadraticCurveTo(520, 350, 800, 300);
-        ctx.lineTo(800, 400);
-        ctx.lineTo(0, 400);
-        ctx.fill();
-        ctx.fillStyle = "#d6b98a";
-        ctx.beginPath();
-        ctx.moveTo(40, 360);
-        ctx.quadraticCurveTo(200, 320, 360, 360);
-        ctx.quadraticCurveTo(520, 400, 760, 360);
-        ctx.lineTo(760, 390);
-        ctx.quadraticCurveTo(520, 410, 360, 390);
-        ctx.quadraticCurveTo(200, 370, 40, 390);
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = "#4aa3ff";
-        ctx.beginPath();
-        ctx.moveTo(120, 320);
-        ctx.quadraticCurveTo(220, 280, 360, 320);
-        ctx.quadraticCurveTo(500, 360, 680, 320);
-        ctx.lineTo(680, 360);
-        ctx.quadraticCurveTo(500, 400, 360, 360);
-        ctx.quadraticCurveTo(220, 320, 120, 360);
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = "#79c25e";
-        ctx.fillRect(0, 360, canvas.width, 40);
-        drawHUD();
-    }
+    document.addEventListener("keydown",e=>{if(e.key==="Enter"){if(typing)skipTyping=true;else if(waitingForEnter&&nextLineCallback){const fn=nextLineCallback;nextLineCallback=null;waitingForEnter=false;fn()}}});
+    startBtn.addEventListener("click",()=>{titleScreen.style.display="none";gameScreen.style.display="block";scene1()});
 
-    function drawCourthouseInterior() {
-        clearScene();
-        ctx.fillStyle = "#2b2317";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "rgba(255,255,220,0.08)";
-        ctx.fillRect(60, 40, 120, 300);
-        ctx.fillRect(620, 40, 120, 300);
-        ctx.fillStyle = "#3b2d20";
-        ctx.fillRect(260, 40, 280, 40);
-        ctx.fillStyle = "#cfa06d";
-        ctx.fillRect(260, 80, 280, 10);
-        ctx.fillStyle = "#3b2d20";
-        for (let r = 0; r < 3; r++) {
-            ctx.fillRect(80, 120 + r * 40, 640, 18);
-        }
-        ctx.fillStyle = "#8b6b4a";
-        ctx.fillRect(360, 160, 80, 14);
-        const g = ctx.createRadialGradient(400, 70, 10, 400, 70, 220);
-        g.addColorStop(0, "rgba(255,255,220,0.35)");
-        g.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        drawHUD();
-    }
+    function scene1Visual(){drawBackground();drawCharacter(150,240,"#f1d1bb","#4ac",true,true,true);drawCharacter(260,240,"#f1d1bb","#6f4",true,false,true);drawHouse(520,260);drawTree(670,240,22);drawTree(90,250,22);drawHUD()}
+    function scene2Visual(){drawBackground();drawCharacter(140,240,"#f1d1bb","#4ac",true,true,true);drawCharacter(300,240,"#f1d1bb","#b85",true,false,true);drawHouse(460,260);drawTent(600,250);drawTree(360,250,20);drawTree(720,260,18);drawHUD()}
+    function npc3Visual(){drawBackground();drawCharacter(160,240,"#f1d1bb","#4ac",true,true,true);drawCharacter(280,240,"#f1d1bb","#e96",true,false,true);drawTent(600,250);drawTree(420,250,20);drawTree(720,260,18);drawHUD()}
+    function scene3Visual(){drawBackground();drawCharacter(150,240,"#f1d1bb","#4ac",true,true,true);drawHouse(400,260);drawTent(600,250);drawTree(500,240,18);drawHUD()}
+    function courthouseVisual(){drawCourthouseInterior();drawCharacter(200,260,"#f1d1bb","#4ac",true,true,false);drawCharacter(400,260,"#f1d1bb","#b85",true,false,false);drawCharacter(600,260,"#f1d1bb","#e96",true,false,true);drawHUD()}
+    function josiahAndSolomonVisual(){drawBackground();drawCharacter(150,240,"#f1d1bb","#4ac",true,true,true);drawCharacter(200,260,"#f1d1bb","#4ac",false,false,true);drawCharacter(250,260,"#4a3426","#2b2b2b",false,false,false);drawCharacter(300,240,"#f1d1bb","#e96",false,false,false);drawHUD()}
+    function saloonVisual(){clearScene();ctx.fillStyle="#8b5e3c";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#5a3a21";ctx.fillRect(50,300,700,80);drawCharacter(150,240,"#f1d1bb","#4ac",true,true,false);drawCharacter(350,240,"#f1d1bb","#e96",true,false,true);drawCharacter(550,240,"#f1d1bb","#6f4",true,false,false);drawHUD()}
+    function battleVisual(){clearScene();ctx.fillStyle="#333";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#900";ctx.fillRect(0,300,canvas.width,100);drawCharacter(200,240,"#f1d1bb","#4ac",true,true,false);drawCharacter(500,240,"#f1d1bb","#e96",true,false,true);drawTent(400,250);drawTree(100,250,18);drawHUD()}
+    function finalVisual(){drawBackground();drawCharacter(150,240,"#f1d1bb","#4ac",true,true,true);drawTree(500,240,18);drawTent(620,250);drawHouse(400,260);drawHUD()}
 
-    // =========================
-    // DRAW PRIMITIVES
-    // =========================
-    function drawTree(x, y, size = 18) {
-        ctx.fillStyle = "#2f7b2a";
-        ctx.beginPath();
-        ctx.moveTo(x, y - size);
-        ctx.lineTo(x - size, y + size / 2);
-        ctx.lineTo(x + size, y + size / 2);
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = "#6b3e1f";
-        ctx.fillRect(x - Math.floor(size / 6), y + size / 2, Math.floor(size / 3), Math.floor(size / 2));
-    }
-
-    function drawHouse(x, y, w = 48, h = 36) {
-        ctx.fillStyle = "#7a4a22";
-        ctx.fillRect(x, y, w, h);
-        ctx.fillStyle = "#9b2b2b";
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + w / 2, y - h / 2);
-        ctx.lineTo(x + w, y);
-        ctx.closePath();
-        ctx.fill();
-    }
-
-    function drawTent(x, y, w = 40, h = 30) {
-        ctx.fillStyle = "#ff6b4b";
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x - w / 2, y + h);
-        ctx.lineTo(x + w / 2, y + h);
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = "#a2412a";
-        ctx.fillRect(x - 2, y + h - 6, 4, 6);
-    }
-
-    function drawCharacter(x, y, skin = "#f1d1bb", clothes = "#4a9", hat = false, tool = false, bag = false, scale = 1) {
-        const s = Math.round(CHAR_SIZE * scale);
-        ctx.fillStyle = skin;
-        ctx.fillRect(x, y, s, s);
-        ctx.fillStyle = clothes;
-        ctx.fillRect(x, y + s, s, Math.round(s * 1.6));
-        ctx.fillRect(x - Math.round(s / 2), y + s, Math.round(s / 2), Math.round(s * 1.2));
-        ctx.fillRect(x + s, y + s, Math.round(s / 2), Math.round(s * 1.2));
-        ctx.fillRect(x, y + Math.round(s * 2.6), Math.round(s / 2), Math.round(s * 1.4));
-        ctx.fillRect(x + Math.round(s / 2), y + Math.round(s * 2.6), Math.round(s / 2), Math.round(s * 1.4));
-        if (hat) {
-            ctx.fillStyle = "#7a4a22";
-            ctx.fillRect(x - Math.round(s / 6), y - Math.round(s / 4), Math.round(s * 1.3), Math.round(s / 4));
-        }
-        if (tool) {
-            ctx.fillStyle = "#8a8a8a";
-            ctx.fillRect(x + s, y + s, Math.max(3, Math.round(s * 0.3)), Math.round(s * 1.0));
-        }
-        if (bag) {
-            ctx.fillStyle = "#8a6b42";
-            ctx.fillRect(x - Math.round(s / 2), y + s, Math.round(s / 2), Math.round(s * 0.8));
-        }
-    }
-
-    // =========================
-    // TYPEWRITER (modified to update HUD live)
-    // =========================
-    function typeText(text, onComplete) {
-        typing = true;
-        skipTyping = false;
-        waitingForEnter = false;
-        textBox.innerHTML = "";
-        hideChoices();
-        showSkipHint();
-
-        let i = 0;
-        const speed = 26;
-
-        function step() {
-            if (skipTyping) {
-                textBox.innerHTML = text;
-                finish();
-                return;
-            }
-            if (i < text.length) {
-                textBox.innerHTML += text.charAt(i);
-                i++;
-                updateHUD(); // <--- update HUD while typing
-                setTimeout(step, speed);
-            } else {
-                finish();
-            }
-        }
-
-        function finish() {
-            typing = false;
-            waitingForEnter = true;
-            nextLineCallback = onComplete;
-            updateHUD(); // ensure HUD up-to-date after line
-        }
-
-        step();
-    }
-
-    // =========================
-    // SKIP HINT
-    // =========================
-    const skipHint = document.createElement("p");
-    skipHint.style.color = "#d4aa70";
-    skipHint.style.fontSize = "13px";
-    skipHint.style.marginTop = "8px";
-    skipHint.innerText = "Press ENTER to continue";
-    skipHint.style.display = "none";
-    gameScreen.appendChild(skipHint);
-
-    function showSkipHint() { skipHint.style.display = "block"; }
-    function hideSkipHint() { skipHint.style.display = "none"; }
-
-    // =========================
-    // ENTER KEY
-    // =========================
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            if (typing) {
-                skipTyping = true;
-            } else if (waitingForEnter && nextLineCallback) {
-                const fn = nextLineCallback;
-                nextLineCallback = null;
-                waitingForEnter = false;
-                fn();
-            }
-        }
-    });
-
-    // =========================
-    // START BUTTON
-    // =========================
-    startBtn.addEventListener("click", () => {
-        titleScreen.style.display = "none";
-        gameScreen.style.display = "block";
-        showSkipHint();
-        scene1();
-    });
-function scene1Visual() {
-    drawBackground();
-    drawCharacter(150, 240, "#f1d1bb", "#4ac", true, true, true); // player
-    drawCharacter(260, 240, "#f1d1bb", "#6f4", true, false, true); // Josiah
-    drawHouse(520, 260);
-    drawTree(670, 240, 22);
-    drawTree(90, 250, 22);
-    drawHUD();
-}
-
-function scene2Visual() {
-    drawBackground();
-    drawCharacter(140, 240, "#f1d1bb", "#4ac", true, true, true); // player
-    drawCharacter(300, 240, "#f1d1bb", "#b85", true, false, true); // Elias
-    drawHouse(460, 260);
-    drawTent(600, 250);
-    drawTree(360, 250, 20);
-    drawTree(720, 260, 18);
-    drawHUD();
-}
-
-function npc3Visual() {
-    drawBackground();
-    drawCharacter(160, 240, "#f1d1bb", "#4ac", true, true, true); // player
-    drawCharacter(280, 240, "#f1d1bb", "#e96", true, false, true); // Aiyana
-    drawTent(600, 250);
-    drawTree(420, 250, 20);
-    drawTree(720, 260, 18);
-    drawHUD();
-}
-
-function scene3Visual() {
-    drawBackground();
-    drawCharacter(150, 240, "#f1d1bb", "#4ac", true, true, true); // player
-    drawHouse(400, 260);
-    drawTent(600, 250);
-    drawTree(500, 240, 18);
-    drawHUD();
-}
-
-function courthouseVisual() {
-    drawCourthouseInterior();
-    drawCharacter(200, 260, "#f1d1bb", "#4ac", true, true, false); // player
-    drawCharacter(400, 260, "#f1d1bb", "#b85", true, false, false); // Elias or settler
-    drawCharacter(600, 260, "#f1d1bb", "#e96", true, false, true); // Solomon / Aiyana
-    drawHUD();
-}
-
-function josiahAndSolomonVisual() {
-    drawBackground();
-    drawCharacter(150, 240, "#f1d1bb", "#4ac", true, true, true); // player
-    drawCharacter(200, 260, "#f1d1bb", "#4ac", false, false, true); // Josiah
-    drawCharacter(250, 260, "#4a3426", "#2b2b2b", false, false, false); // Solomon
-    drawCharacter(300, 240, "#f1d1bb", "#e96", false, false, false); // Aiyana
-    drawHUD();
-}
-
-function saloonVisual() {
-    clearScene();
-    ctx.fillStyle = "#8b5e3c";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#5a3a21";
-    ctx.fillRect(50, 300, 700, 80); // floor
-    drawCharacter(150, 240, "#f1d1bb", "#4ac", true, true, false); // player
-    drawCharacter(350, 240, "#f1d1bb", "#e96", true, false, true); // NPC
-    drawCharacter(550, 240, "#f1d1bb", "#6f4", true, false, false); // NPC
-    drawHUD();
-}
-
-function battleVisual() {
-    clearScene();
-    ctx.fillStyle = "#333";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#900";
-    ctx.fillRect(0, 300, canvas.width, 100); // ground
-    drawCharacter(200, 240, "#f1d1bb", "#4ac", true, true, false); // player
-    drawCharacter(500, 240, "#f1d1bb", "#e96", true, false, true); // NPC
-    drawTent(400, 250);
-    drawTree(100, 250, 18);
-    drawHUD();
-}
-
-function finalVisual() {
-    drawBackground();
-    drawCharacter(150, 240, "#f1d1bb", "#4ac", true, true, true); // player
-    drawTree(500, 240, 18);
-    drawTent(620, 250);
-    drawHouse(400, 260);
-    drawHUD();
-}
 
 function scene4NPC1FollowupVisual() {
     drawBackground();
