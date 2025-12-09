@@ -70,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.fillStyle = g;
         ctx.fillRect(0,0,canvas.width,canvas.height);
 
+        // Sun
         ctx.fillStyle = "#ffd24d";
         ctx.beginPath();
         ctx.arc(700,70,28,0,Math.PI*2);
@@ -81,14 +82,13 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.moveTo(0,260);
         ctx.bezierCurveTo(200,200,380,260,800,260);
         ctx.lineTo(800,400); ctx.lineTo(0,400); ctx.fill();
-
         ctx.fillStyle="#3a7b2f";
         ctx.beginPath();
         ctx.moveTo(0,300);
         ctx.bezierCurveTo(180,250,360,300,800,300);
         ctx.lineTo(800,400); ctx.lineTo(0,400); ctx.fill();
 
-        // Foreground paths
+        // Paths
         ctx.fillStyle="#d6b98a";
         ctx.beginPath();
         ctx.moveTo(40,360);
@@ -99,20 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.quadraticCurveTo(200,370,40,390);
         ctx.closePath();
         ctx.fill();
-
-        ctx.fillStyle="#4aa3ff";
-        ctx.beginPath();
-        ctx.moveTo(120,320);
-        ctx.quadraticCurveTo(220,280,360,320);
-        ctx.quadraticCurveTo(500,360,680,320);
-        ctx.lineTo(680,360);
-        ctx.quadraticCurveTo(500,400,360,360);
-        ctx.quadraticCurveTo(220,320,120,360);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.fillStyle="#79c25e";
-        ctx.fillRect(0,360,canvas.width,40);
 
         drawHUD();
     }
@@ -139,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return y;
     }
 
-    // ---------------- Draw Objects ----------------
+    // ---------------- Objects ----------------
     function drawTree(x,s=22,layer="foreground"){
         const y = getGroundY(x, layer)-s;
         ctx.fillStyle="#2f7b2a";
@@ -163,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.lineTo(x+w,y);
         ctx.closePath();
         ctx.fill();
-        ctx.fillStyle="#4a2a1f"; ctx.fillRect(x+w/3, y+h/2, w/3, h/2); // door
+        ctx.fillStyle="#4a2a1f"; ctx.fillRect(x+w/3, y+h/2, w/3, h/2);
     }
 
     function drawTent(x,w=45,h=35,layer="foreground"){
@@ -194,18 +180,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if(bag){ctx.fillStyle="#8a6b42";ctx.fillRect(x-Math.round(s/2),y+s,Math.round(s/2),Math.round(s*0.8))}
     }
 
-    function drawJosiah(x, layer="foreground", scale=1) {
-        drawCharacter(x, "#4a2f20", "#2b8a3e", true, false, true, scale, layer);
-    }
-
-    function drawSolomon(x, layer="foreground", scale=1) {
-        drawCharacter(x, "#3a1f16", "#4a2b6b", false, true, false, scale, layer);
-    }
+    function drawJosiah(x, layer="foreground", scale=1) { drawCharacter(x, "#4a2f20", "#2b8a3e", true, false, true, scale, layer); }
+    function drawSolomon(x, layer="foreground", scale=1) { drawCharacter(x, "#3a1f16", "#4a2b6b", false, true, false, scale, layer); }
 
     // ---------------- Courthouse Interior ----------------
     function drawCourthouseInterior(){
         clearScene();
-        ctx.fillStyle="#2b2317"; ctx.fillRect(0,0,canvas.width,canvas.height); // walls
+        ctx.fillStyle="#2b2317"; ctx.fillRect(0,0,canvas.width,canvas.height);
         // Columns
         ctx.fillStyle="rgba(255,255,220,0.08)";
         ctx.fillRect(60,40,120,300); ctx.fillRect(620,40,120,300);
@@ -215,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Benches
         ctx.fillStyle="#3b2d20";
         for(let r=0;r<3;r++) ctx.fillRect(80,120+r*40,640,18);
-        // Ceiling light gradient
+        // Ceiling light
         const g=ctx.createRadialGradient(400,70,10,400,70,220);
         g.addColorStop(0,"rgba(255,255,220,0.35)"); g.addColorStop(1,"rgba(0,0,0,0)");
         ctx.fillStyle=g; ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -223,10 +204,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ---------------- Scene Visuals ----------------
+
     function scene1Visual(){
         drawBackground();
         drawJosiah(140,"foreground");
         drawCharacter(260,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawTent(200,45,35,"foreground");
         drawHouse(520,50,40,"foreground");
         drawTree(680,22,"hills");
         drawTree(100,22,"hills");
@@ -240,6 +223,8 @@ document.addEventListener("DOMContentLoaded", () => {
         drawTent(610,45,35,"river");
         drawTree(370,20,"hills");
         drawTree(730,18,"hills");
+        drawTent(200,40,30,"river");
+        drawTent(500,40,35,"river");
     }
 
     function npc3Visual(){
@@ -249,15 +234,11 @@ document.addEventListener("DOMContentLoaded", () => {
         drawTent(610,45,35,"river");
         drawTree(430,20,"hills");
         drawTree(730,18,"hills");
+        // Extra NPCs behind Aiyana
+        drawCharacter(580,"#f1d1bb","#e5a",false,false,false,0.8,"foreground");
+        drawCharacter(640,"#f1d1bb","#e5a",false,false,false,0.8,"foreground");
     }
 
-    function scene3Visual(){
-        drawBackground();
-        drawJosiah(150,"foreground");
-        drawHouse(400,80,60,"foreground");
-        drawTent(600,45,35,"river");
-        drawTree(500,18,"hills");
-    }
 
     function courthouseVisual(){
         drawCourthouseInterior();
@@ -301,18 +282,14 @@ document.addEventListener("DOMContentLoaded", () => {
         drawHouse(400,48,36,"foreground");
     }
 
-    // ---------------- Final Campfire ----------------
     function drawFinalCampfireVisual() {
         clearScene();
         ctx.fillStyle = "#0b2336"; ctx.fillRect(0,0,canvas.width,canvas.height); // night sky
-
         ctx.fillStyle = "#123a1f";
         ctx.beginPath();
         ctx.moveTo(0,300); ctx.quadraticCurveTo(200,260,400,300); ctx.quadraticCurveTo(600,340,800,300);
         ctx.lineTo(800,400); ctx.lineTo(0,400); ctx.fill();
-
         ctx.fillStyle="#12220f"; ctx.fillRect(0,320,canvas.width,80); // ground
-
         // Fire glow
         const fx = 380, fy = 280;
         for (let r = 80; r > 0; r -= 20) {
@@ -320,10 +297,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.fillStyle = `rgba(255, ${120 + r}, 50, ${0.08 + alpha})`;
             ctx.beginPath(); ctx.arc(fx, fy, r, 0, Math.PI*2); ctx.fill();
         }
-
         // Logs
         ctx.fillStyle="#5b3a24"; ctx.fillRect(360,300,60,12); ctx.fillRect(342,310,12,60);
-
         // NPCs
         drawJosiah(340,"foreground",0.7);
         drawSolomon(380,"foreground",0.7);
@@ -370,17 +345,6 @@ document.addEventListener("DOMContentLoaded", () => {
         scene1();
     });
 
-    // ---------------- Courthouse Interior ----------------
-    function drawCourthouseInterior(){
-        clearScene();
-        ctx.fillStyle="#2b2317"; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle="rgba(255,255,220,0.08)"; ctx.fillRect(60,40,120,300); ctx.fillRect(620,40,120,300);
-        ctx.fillStyle="#3b2d20"; ctx.fillRect(260,40,280,40);
-        ctx.fillStyle="#cfa06d"; ctx.fillRect(260,80,280,10);
-        ctx.fillStyle="#3b2d20"; for(let r=0;r<3;r++) ctx.fillRect(80,120+r*40,640,18);
-        const g=ctx.createRadialGradient(400,70,10,400,70,220); g.addColorStop(0,"rgba(255,255,220,0.35)"); g.addColorStop(1,"rgba(0,0,0,0)"); ctx.fillStyle=g; ctx.fillRect(0,0,canvas.width,canvas.height);
-        drawHUD();
-    }
 
 
     // =========================
@@ -530,7 +494,7 @@ function npc3Scene() {
 }
 
 function scene3() {
-    scene3Visual();
+    courthouseVisual();
     const lines = [
         "Having finally found a place to claim, you begin trying to find gold, but fail. As night falls, you head to the small settlement put together for those searching for gold. You eat and fall asleep, thinking about Aiyana.",
         "As you wake up, you see some new notices being set up outside the courthouse.",
