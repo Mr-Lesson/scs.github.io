@@ -11,19 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let gold = 0, morality = 0, choicesLog = [];
     const CHAR_SIZE = 16;
     const HUD = {x:10,y:10,width:180,height:50,padding:8,bgColor:"rgba(0,0,0,0.5)",borderColor:"#d4aa70",borderWidth:2,textColor:"#fff",font:"16px monospace"};
-    //----------------------
-    // AUDIO SETUP
-    // --------------------
-    const bgMusic = new Audio("audio/a-beautiful-morning-174653.mp3"); // path to your file
-    bgMusic.volume = 0.2;       // relatively low volume
-    bgMusic.loop = true;        // loop indefinitely
-    startBtn.addEventListener("click", () => {
-        titleScreen.style.display = "none";
-        gameScreen.style.display = "block";
-
-        // Play music
-        bgMusic.play().catch(e => console.log("Music play prevented:", e));
-    });
     function drawHUD(){
         ctx.fillStyle = HUD.bgColor;
         ctx.fillRect(HUD.x, HUD.y, HUD.width, HUD.height);
@@ -204,9 +191,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    const bgMusic = new Audio("audio/a-beautiful-morning-174653.mp3");
+    bgMusic.volume = 0.2;
+    bgMusic.loop = true;
+    //----------------------
+    // AUDIO SETUP
+    // --------------------
+
     startBtn.addEventListener("click", () => {
         titleScreen.style.display = "none";
         gameScreen.style.display = "block";
+        // Play music once the user interacts
+        bgMusic.play().catch(e => console.log("Music play prevented:", e));
+
         scene1();
     });
 
