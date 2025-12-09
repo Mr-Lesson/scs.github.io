@@ -6,10 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const choicesDiv = document.getElementById("choices");
     const canvas = document.getElementById("scene-canvas");
     const ctx = canvas.getContext("2d");
-    const refBtn = document.getElementById("ref");
     let typing = false, skipTyping = false, waitingForEnter = false, nextLineCallback = null;
     let gold = 0, morality = 0, choicesLog = [];
     const CHAR_SIZE = 16;
+    const GROUND_Y = 360
     const HUD = {x:10,y:10,width:180,height:50,padding:8,bgColor:"rgba(0,0,0,0.5)",borderColor:"#d4aa70",borderWidth:2,textColor:"#fff",font:"16px monospace"};
     function drawHUD(){
         ctx.fillStyle = HUD.bgColor;
@@ -207,97 +207,221 @@ document.addEventListener("DOMContentLoaded", () => {
         scene1();
     });
 
-    
-    function drawCourthouseInterior(){clearScene();ctx.fillStyle="#2b2317";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle="rgba(255,255,220,0.08)";ctx.fillRect(60,40,120,300);ctx.fillRect(620,40,120,300);ctx.fillStyle="#3b2d20";ctx.fillRect(260,40,280,40);ctx.fillStyle="#cfa06d";ctx.fillRect(260,80,280,10);ctx.fillStyle="#3b2d20";for(let r=0;r<3;r++)ctx.fillRect(80,120+r*40,640,18);ctx.fillStyle="#8b6b4a";ctx.fillRect(360,160,80,14);const g=ctx.createRadialGradient(400,70,10,400,70,220);g.addColorStop(0,"rgba(255,255,220,0.35)");g.addColorStop(1,"rgba(0,0,0,0)");ctx.fillStyle=g;ctx.fillRect(0,0,canvas.width,canvas.height);drawHUD()}
-    function drawTree(x,y,s=18){ctx.fillStyle="#2f7b2a";ctx.beginPath();ctx.moveTo(x,y-s);ctx.lineTo(x-s,y+s/2);ctx.lineTo(x+s,y+s/2);ctx.closePath();ctx.fill();ctx.fillStyle="#6b3e1f";ctx.fillRect(x-Math.floor(s/6),y+s/2,Math.floor(s/3),Math.floor(s/2))}
-    function drawHouse(x,y,w=48,h=36){ctx.fillStyle="#7a4a22";ctx.fillRect(x,y,w,h);ctx.fillStyle="#9b2b2b";ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w/2,y-h/2);ctx.lineTo(x+w,y);ctx.closePath();ctx.fill()}
-    function drawTent(x,y,w=40,h=30){ctx.fillStyle="#ff6b4b";ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-w/2,y+h);ctx.lineTo(x+w/2,y+h);ctx.closePath();ctx.fill();ctx.fillStyle="#a2412a";ctx.fillRect(x-2,y+h-6,4,6)}
-    function drawCharacter(x,y,skin="#f1d1bb",clothes="#4a9",hat=false,tool=false,bag=false,scale=1){const s=Math.round(CHAR_SIZE*scale);ctx.fillStyle=skin;ctx.fillRect(x,y,s,s);ctx.fillStyle=clothes;ctx.fillRect(x,y+s,s,Math.round(s*1.6));ctx.fillRect(x-Math.round(s/2),y+s,Math.round(s/2),Math.round(s*1.2));ctx.fillRect(x+s,y+s,Math.round(s/2),Math.round(s*1.2));ctx.fillRect(x,y+Math.round(s*2.6),Math.round(s/2),Math.round(s*1.4));ctx.fillRect(x+Math.round(s/2),y+Math.round(s*2.6),Math.round(s/2),Math.round(s*1.4));if(hat){ctx.fillStyle="#7a4a22";ctx.fillRect(x-Math.round(s/6),y-Math.round(s/4),Math.round(s*1.3),Math.round(s/4))}if(tool){ctx.fillStyle="#8a8a8a";ctx.fillRect(x+s,y+s,Math.max(3,Math.round(s*0.3)),Math.round(s*1.0))}if(bag){ctx.fillStyle="#8a6b42";ctx.fillRect(x-Math.round(s/2),y+s,Math.round(s/2),Math.round(s*0.8))}}
+        
+    function drawCourthouseInterior(){
+        clearScene();
+        
+        // walls + columns
+        ctx.fillStyle="#2b2317";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        ctx.fillStyle="rgba(255,255,220,0.08)";
+        ctx.fillRect(60,40,120,300);
+        ctx.fillRect(620,40,120,300);
+
+        // judge platform
+        ctx.fillStyle="#3b2d20";
+        ctx.fillRect(260,40,280,40);
+        ctx.fillStyle="#cfa06d";
+        ctx.fillRect(260,80,280,10);
+
+        // railing rows
+        ctx.fillStyle="#3b2d20";
+        for(let r=0;r<3;r++) ctx.fillRect(80,120+r*40,640,18);
+
+        // bench highlight glow
+        const g=ctx.createRadialGradient(400,70,10,400,70,220);
+        g.addColorStop(0,"rgba(255,255,220,0.35)");
+        g.addColorStop(1,"rgba(0,0,0,0)");
+        ctx.fillStyle=g;
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        drawHUD();
+    }
+
+
+    // 🌲 TREE — sits on ground regardless of size
+    function drawTree(x,s=18){
+        const y = GROUND_Y - (s*2.5); // grounded + proportional height
+
+        ctx.fillStyle="#2f7b2a";
+        ctx.beginPath();
+        ctx.moveTo(x,y-s);
+        ctx.lineTo(x-s,y+s/2);
+        ctx.lineTo(x+s,y+s/2);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle="#6b3e1f";
+        ctx.fillRect(x-Math.floor(s/6),y+s/2,Math.floor(s/3),Math.floor(s/1.3));
+    }
+
+
+
+        function drawHouse(x,w=70,h=55){
+        const y = GROUND_Y - h; // touches floor
+
+        ctx.fillStyle="#7a4a22";
+        ctx.fillRect(x-w/2,y,w,h);
+
+        ctx.fillStyle="#9b2b2b";
+        ctx.beginPath();
+        ctx.moveTo(x-w/2,y);
+        ctx.lineTo(x,y-h/1.6);
+        ctx.lineTo(x+w/2,y);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+
+
+    function drawTent(x,w=46,h=36){
+        const y = GROUND_Y - h;
+
+        ctx.fillStyle="#ff6b4b";
+        ctx.beginPath();
+        ctx.moveTo(x,y);
+        ctx.lineTo(x-w/2,y+h);
+        ctx.lineTo(x+w/2,y+h);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle="#a2412a";
+        ctx.fillRect(x-2,y+h-6,4,6);
+    }
+
+
+    function drawCharacter(
+        x,
+        skin="#f1d1bb",
+        clothes="#4a9",
+        hat=false,
+        tool=false,
+        bag=false,
+        scale=1
+    ){
+        const y = GROUND_Y - Math.round(CHAR_SIZE*scale*2.8); // perfect ground position
+        const s = Math.round(CHAR_SIZE*scale);
+
+        // head
+        ctx.fillStyle=skin;
+        ctx.fillRect(x,y,s,s);
+
+        // torso
+        ctx.fillStyle=clothes;
+        ctx.fillRect(x,y+s,s,Math.round(s*1.6));
+
+        // arms
+        ctx.fillRect(x-Math.round(s/2),y+s,Math.round(s/2),Math.round(s*1.2));
+        ctx.fillRect(x+s,y+s,Math.round(s/2),Math.round(s*1.2));
+
+        // legs
+        ctx.fillRect(x,y+Math.round(s*2.6),Math.round(s/2),Math.round(s*1.4));
+        ctx.fillRect(x+Math.round(s/2),y+Math.round(s*2.6),Math.round(s/2),Math.round(s*1.4));
+
+        // hat optional
+        if(hat){
+            ctx.fillStyle="#7a4a22";
+            ctx.fillRect(x-Math.round(s/6),y-Math.round(s/4),Math.round(s*1.3),Math.round(s/4));
+        }
+
+        // tool
+        if(tool){
+            ctx.fillStyle="#8a8a8a";
+            ctx.fillRect(x+s,y+s,Math.max(3,Math.round(s*0.3)),Math.round(s*1.0));
+        }
+
+        // bag
+        if(bag){
+            ctx.fillStyle="#8a6b42";
+            ctx.fillRect(x-Math.round(s/2),y+s,Math.round(s/2),Math.round(s*0.8));
+        }
+    }
 
     function scene1Visual(){
         drawBackground();
-        drawCharacter(150,280,"#f1d1bb","#4ac",true,true,true);
-        drawCharacter(260,280,"#f1d1bb","#6f4",true,false,true);
-        drawHouse(520,300);
-        drawTree(670,270,22);
-        drawTree(90,275,22);
+        drawCharacter(150);
+        drawCharacter(260);
+        drawHouse(520);
+        drawTree(670,22);
+        drawTree(90,22);
         drawHUD();
     }
 
     function scene2Visual(){
         drawBackground();
-        drawCharacter(140,280,"#f1d1bb","#4ac",true,true,true);
-        drawCharacter(300,280,"#f1d1bb","#b85",true,false,true);
-        drawHouse(460,300);
-        drawTent(600,285);
-        drawTree(360,275,20);
-        drawTree(720,290,18);
+        drawCharacter(140);
+        drawCharacter(300);
+        drawHouse(460);
+        drawTent(600);
+        drawTree(360,20);
+        drawTree(720,18);
         drawHUD();
     }
 
     function npc3Visual(){
         drawBackground();
-        drawCharacter(160,280,"#f1d1bb","#4ac",true,true,true);
-        drawCharacter(280,280,"#f1d1bb","#e96",true,false,true);
-        drawTent(600,285);
-        drawTree(420,275,20);
-        drawTree(720,290,18);
+        drawCharacter(160);
+        drawCharacter(280);
+        drawTent(600);
+        drawTree(420,20);
+        drawTree(720,18);
         drawHUD();
     }
 
     function scene3Visual(){
         drawBackground();
-        drawCharacter(150,280,"#f1d1bb","#4ac",true,true,true);
-        drawHouse(400,300);
-        drawTent(600,285);
-        drawTree(500,270,18);
+        drawCharacter(150);
+        drawHouse(400);
+        drawTent(600);
+        drawTree(500,18);
         drawHUD();
     }
 
     function courthouseVisual(){
         drawCourthouseInterior();
-        drawCharacter(200,300,"#f1d1bb","#4ac",true,true,false);
-        drawCharacter(400,300,"#f1d1bb","#b85",true,false,false);
-        drawCharacter(600,300,"#f1d1bb","#e96",true,false,true);
+        drawCharacter(200);
+        drawCharacter(400);
+        drawCharacter(600);
         drawHUD();
     }
 
     function josiahAndSolomonVisual(){
         drawBackground();
-        drawCharacter(150,280,"#f1d1bb","#4ac",true,true,true);
-        drawCharacter(200,300,"#f1d1bb","#4ac",false,false,true);
-        drawCharacter(250,300,"#4a3426","#2b2b2b",false,false,false);
-        drawCharacter(300,280,"#f1d1bb","#e96",false,false,false);
+        drawCharacter(150);
+        drawCharacter(200);
+        drawCharacter(250);
+        drawCharacter(300);
         drawHUD();
     }
 
     function saloonVisual(){
         clearScene();
         ctx.fillStyle="#8b5e3c"; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle="#5a3a21"; ctx.fillRect(50,300,700,80);
-        drawCharacter(150,280,"#f1d1bb","#4ac",true,true,false);
-        drawCharacter(350,280,"#f1d1bb","#e96",true,false,true);
-        drawCharacter(550,280,"#f1d1bb","#6f4",true,false,false);
+        ctx.fillStyle="#5a3a21"; ctx.fillRect(50,GROUND_Y-60,700,80);
+        drawCharacter(150);
+        drawCharacter(350);
+        drawCharacter(550);
         drawHUD();
     }
 
     function battleVisual(){
         clearScene();
         ctx.fillStyle="#333"; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle="#900"; ctx.fillRect(0,300,canvas.width,100);
-        drawCharacter(200,280,"#f1d1bb","#4ac",true,true,false);
-        drawCharacter(500,280,"#f1d1bb","#e96",true,false,true);
-        drawTent(400,285);
-        drawTree(100,275,18);
+        ctx.fillStyle="#900"; ctx.fillRect(0,GROUND_Y,canvas.width,100);
+        drawCharacter(200);
+        drawCharacter(500);
+        drawTent(400);
+        drawTree(100,18);
         drawHUD();
     }
 
     function finalVisual(){
         drawBackground();
-        drawCharacter(150,280,"#f1d1bb","#4ac",true,true,true);
-        drawTree(500,270,18);
-        drawTent(620,285);
-        drawHouse(400,300);
+        drawCharacter(150);
+        drawTree(500,18);
+        drawTent(620);
+        drawHouse(400);
         drawHUD();
     }
 
@@ -682,7 +806,7 @@ function sceneCoercion() {
     function finalScene() {
         // The final reflection: campfire with all NPCs, 3 endings based on combination of gold + morality
         finalVisual();
-
+5
         // calculate outcome metric: combine gold and morality with weights
         // We'll normalize roughly: gold threshold ~ 50, morality threshold ~ 2
         const goldScore = gold;
