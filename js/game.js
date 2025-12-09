@@ -118,6 +118,64 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.fillRect(0,360,canvas.width,40);
         drawHUD();
     }
+    function getGroundY(x, layer="foreground") {
+    // Default flat ground
+    let y = 360; 
+
+    if(layer === "hills") {
+        // Green hills layer
+        if(x <= 380) {
+            // Left curve: quadratic (0,260) -> control(200,200) -> (380,260)
+            const t = (x-0)/380;
+            y = (1-t)*(1-t)*260 + 2*(1-t)*t*200 + t*t*260;
+        } else if(x <= 520) {
+            // Middle curve: (380,260) -> control(520,300) -> (520,?) approx linear
+            const t = (x-380)/(520-380);
+            y = (1-t)*(260) + t*(300);
+        } else {
+            // Right slope to 800,260
+            const t = (x-520)/(800-520);
+            y = (1-t)*300 + t*260;
+        }
+    } else if(layer === "foreground") {
+        // Foreground grass layer (flat-ish)
+        if(x >= 0 && x <= 40) y = 390;
+        else if(x >= 40 && x <= 200) {
+            const t = (x-40)/(200-40);
+            y = (1-t)*390 + t*370;
+        } else if(x >= 200 && x <= 360) {
+            const t = (x-200)/(360-200);
+            y = (1-t)*370 + t*390;
+        } else if(x >= 360 && x <= 520) {
+            const t = (x-360)/(520-360);
+            y = (1-t)*390 + t*410;
+        } else if(x >= 520 && x <= 760) {
+            const t = (x-520)/(760-520);
+            y = (1-t)*410 + t*390;
+        } else {
+            y = 390;
+        }
+    } else if(layer === "river") {
+        // Blue river layer
+        if(x <= 220) {
+            const t = (x-120)/(220-120);
+            y = (1-t)*360 + t*280;
+        } else if(x <= 360) {
+            const t = (x-220)/(360-220);
+            y = (1-t)*280 + t*320;
+        } else if(x <= 500) {
+            const t = (x-360)/(500-360);
+            y = (1-t)*320 + t*360;
+        } else if(x <= 680) {
+            const t = (x-500)/(680-500);
+            y = (1-t)*360 + t*320;
+        } else {
+            y = 320;
+        }
+    }
+
+    return y;
+}
 
     // ------------------------
     // TYPING TEXT LOGIC
@@ -239,45 +297,34 @@ document.addEventListener("DOMContentLoaded", () => {
         drawHUD();
     }
 
+    function drawTree(x,s=18,layer="foreground"){
+    const y = getGroundY(x, layer) - s; // tree trunk stands on ground
+    ctx.fillStyle="#2f7b2a";
+    ctx.beginPath();
+    ctx.moveTo(x,y-s);
+    ctx.lineTo(x-s,y+s/2);
+    ctx.lineTo(x+s,y+s/2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle="#6b3e1f";
+    ctx.fillRect(x-Math.floor(s/6),y+s/2,Math.floor(s/3),Math.floor(s/2));
+}
 
-    // 🌲 TREE — sits on ground regardless of size
-    function drawTree(x,s=18){
-        const y = GROUND_Y - (s*2.5); // grounded + proportional height
-
-        ctx.fillStyle="#2f7b2a";
-        ctx.beginPath();
-        ctx.moveTo(x,y-s);
-        ctx.lineTo(x-s,y+s/2);
-        ctx.lineTo(x+s,y+s/2);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.fillStyle="#6b3e1f";
-        ctx.fillRect(x-Math.floor(s/6),y+s/2,Math.floor(s/3),Math.floor(s/1.3));
-    }
-
-
-
-        function drawHouse(x,w=70,h=55){
-        const y = GROUND_Y - h; // touches floor
-
+    function drawHouse(x,w=48,h=36,layer="foreground"){
+        const y = getGroundY(x, layer) - h;
         ctx.fillStyle="#7a4a22";
-        ctx.fillRect(x-w/2,y,w,h);
-
+        ctx.fillRect(x,y,w,h);
         ctx.fillStyle="#9b2b2b";
         ctx.beginPath();
-        ctx.moveTo(x-w/2,y);
-        ctx.lineTo(x,y-h/1.6);
-        ctx.lineTo(x+w/2,y);
+        ctx.moveTo(x,y);
+        ctx.lineTo(x+w/2,y-h/2);
+        ctx.lineTo(x+w,y);
         ctx.closePath();
         ctx.fill();
     }
 
-
-
-    function drawTent(x,w=46,h=36){
-        const y = GROUND_Y - h;
-
+    function drawTent(x,w=40,h=30,layer="foreground"){
+        const y = getGroundY(x, layer) - h;
         ctx.fillStyle="#ff6b4b";
         ctx.beginPath();
         ctx.moveTo(x,y);
@@ -285,144 +332,102 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.lineTo(x+w/2,y+h);
         ctx.closePath();
         ctx.fill();
-
         ctx.fillStyle="#a2412a";
         ctx.fillRect(x-2,y+h-6,4,6);
     }
 
-
-    function drawCharacter(
-        x,
-        skin="#f1d1bb",
-        clothes="#4a9",
-        hat=false,
-        tool=false,
-        bag=false,
-        scale=1
-    ){
-        const y = GROUND_Y - Math.round(CHAR_SIZE*scale*2.8); // perfect ground position
-        const s = Math.round(CHAR_SIZE*scale);
-
-        // head
+    function drawCharacter(x,skin="#f1d1bb",clothes="#4a9",hat=false,tool=false,bag=false,scale=1,layer="foreground"){
+        const s=Math.round(CHAR_SIZE*scale);
+        const y = getGroundY(x, layer) - Math.round(s*2.8);
         ctx.fillStyle=skin;
         ctx.fillRect(x,y,s,s);
-
-        // torso
         ctx.fillStyle=clothes;
         ctx.fillRect(x,y+s,s,Math.round(s*1.6));
-
-        // arms
         ctx.fillRect(x-Math.round(s/2),y+s,Math.round(s/2),Math.round(s*1.2));
         ctx.fillRect(x+s,y+s,Math.round(s/2),Math.round(s*1.2));
-
-        // legs
         ctx.fillRect(x,y+Math.round(s*2.6),Math.round(s/2),Math.round(s*1.4));
         ctx.fillRect(x+Math.round(s/2),y+Math.round(s*2.6),Math.round(s/2),Math.round(s*1.4));
-
-        // hat optional
-        if(hat){
-            ctx.fillStyle="#7a4a22";
-            ctx.fillRect(x-Math.round(s/6),y-Math.round(s/4),Math.round(s*1.3),Math.round(s/4));
-        }
-
-        // tool
-        if(tool){
-            ctx.fillStyle="#8a8a8a";
-            ctx.fillRect(x+s,y+s,Math.max(3,Math.round(s*0.3)),Math.round(s*1.0));
-        }
-
-        // bag
-        if(bag){
-            ctx.fillStyle="#8a6b42";
-            ctx.fillRect(x-Math.round(s/2),y+s,Math.round(s/2),Math.round(s*0.8));
-        }
+        if(hat){ctx.fillStyle="#7a4a22";ctx.fillRect(x-Math.round(s/6),y-Math.round(s/4),Math.round(s*1.3),Math.round(s/4))}
+        if(tool){ctx.fillStyle="#8a8a8a";ctx.fillRect(x+s,y+s,Math.max(3,Math.round(s*0.3)),Math.round(s*1.0))}
+        if(bag){ctx.fillStyle="#8a6b42";ctx.fillRect(x-Math.round(s/2),y+s,Math.round(s/2),Math.round(s*0.8))}
     }
 
     function scene1Visual(){
         drawBackground();
-        drawCharacter(150);
-        drawCharacter(260);
-        drawHouse(520);
-        drawTree(670,22);
-        drawTree(90,22);
-        drawHUD();
+        drawCharacter(150,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawCharacter(260,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawHouse(520,48,36,"foreground");
+        drawTree(670,22,"hills");
+        drawTree(90,22,"hills");
     }
 
     function scene2Visual(){
         drawBackground();
-        drawCharacter(140);
-        drawCharacter(300);
-        drawHouse(460);
-        drawTent(600);
-        drawTree(360,20);
-        drawTree(720,18);
-        drawHUD();
+        drawCharacter(140,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawCharacter(300,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawHouse(460,48,36,"foreground");
+        drawTent(600,40,30,"river");
+        drawTree(360,20,"hills");
+        drawTree(720,18,"hills");
     }
 
     function npc3Visual(){
         drawBackground();
-        drawCharacter(160);
-        drawCharacter(280);
-        drawTent(600);
-        drawTree(420,20);
-        drawTree(720,18);
-        drawHUD();
+        drawCharacter(160,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawCharacter(280,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawTent(600,40,30,"river");
+        drawTree(420,20,"hills");
+        drawTree(720,18,"hills");
     }
 
     function scene3Visual(){
         drawBackground();
-        drawCharacter(150);
-        drawHouse(400);
-        drawTent(600);
-        drawTree(500,18);
-        drawHUD();
+        drawCharacter(150,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawHouse(400,48,36,"foreground");
+        drawTent(600,40,30,"river");
+        drawTree(500,18,"hills");
     }
 
     function courthouseVisual(){
         drawCourthouseInterior();
-        drawCharacter(200);
-        drawCharacter(400);
-        drawCharacter(600);
-        drawHUD();
+        drawCharacter(200,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawCharacter(400,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawCharacter(600,"#f1d1bb","#4a9",false,false,false,1,"foreground");
     }
 
     function josiahAndSolomonVisual(){
         drawBackground();
-        drawCharacter(150);
-        drawCharacter(200);
-        drawCharacter(250);
-        drawCharacter(300);
-        drawHUD();
+        drawCharacter(150,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawCharacter(200,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawCharacter(250,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawCharacter(300,"#f1d1bb","#4a9",false,false,false,1,"foreground");
     }
 
     function saloonVisual(){
         clearScene();
         ctx.fillStyle="#8b5e3c"; ctx.fillRect(0,0,canvas.width,canvas.height);
         ctx.fillStyle="#5a3a21"; ctx.fillRect(50,GROUND_Y-60,700,80);
-        drawCharacter(150);
-        drawCharacter(350);
-        drawCharacter(550);
-        drawHUD();
+        drawCharacter(150,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawCharacter(350,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawCharacter(550,"#f1d1bb","#4a9",false,false,false,1,"foreground");
     }
 
     function battleVisual(){
         clearScene();
         ctx.fillStyle="#333"; ctx.fillRect(0,0,canvas.width,canvas.height);
         ctx.fillStyle="#900"; ctx.fillRect(0,GROUND_Y,canvas.width,100);
-        drawCharacter(200);
-        drawCharacter(500);
-        drawTent(400);
-        drawTree(100,18);
-        drawHUD();
+        drawCharacter(200,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawCharacter(500,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawTent(400,40,30,"river");
+        drawTree(100,18,"hills");
     }
 
     function finalVisual(){
         drawBackground();
-        drawCharacter(150);
-        drawTree(500,18);
-        drawTent(620);
-        drawHouse(400);
-        drawHUD();
+        drawCharacter(150,"#f1d1bb","#4a9",false,false,false,1,"foreground");
+        drawTree(500,18,"hills");
+        drawTent(620,40,30,"river");
+        drawHouse(400,48,36,"foreground");
     }
 
     // =========================
