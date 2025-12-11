@@ -212,19 +212,31 @@ document.addEventListener("DOMContentLoaded", () => {
         drawHUD();
     }
 
-    function courthouseVisual() {
+        function courthouseVisual() {
         drawCourthouseInterior();
 
-        // Judge
+        // Indoor flat floor
+        const groundY = canvas.height - 60;
+
+        function drawOnFloor(x, scale=1, skin, clothes, hat=false, tool=false, bag=false) {
+            const s = CHAR_SIZE * scale;
+            const charHeight = s * 2.8;
+            const y = groundY - charHeight;
+            drawCharacter(x, skin, clothes, hat, tool, bag, scale, "foreground");
+        }
+
+        // Judge (raised platform)
         drawCharacter(390, "#f1d1bb", "#2b4a7a", false, false, false, 1, "foreground");
 
-        // Settler side (right)
-        drawCharacter(600, "#f1d1bb", "#a55", false, false, false, 1, "foreground");
+        // Settler
+        drawOnFloor(600, 1, "#f1d1bb", "#a55");
 
-        // Californio family side (left)
-        drawCharacter(180, "#d9b38c", "#4a2f20", false, false, false, 1, "foreground");
-        drawCharacter(220, "#d9b38c", "#4a2f20", false, false, false, 0.9, "foreground");
-        drawCharacter(260, "#d9b38c", "#4a2f20", false, false, false, 0.8, "foreground");
+        // Californio family
+        drawOnFloor(180, 1,   "#d9b38c", "#4a2f20");
+        drawOnFloor(220, 0.9, "#d9b38c", "#4a2f20");
+        drawOnFloor(260, 0.8, "#d9b38c", "#4a2f20");
+
+        drawHUD();
     }
 
 
@@ -287,28 +299,54 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.fillStyle = "#0d0d0d";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Flat ground
-        const groundY = 330;
+        // Ground plane
+        const groundY = canvas.height - 70;
         ctx.fillStyle = "#300000";
         ctx.fillRect(0, groundY, canvas.width, 70);
 
-        // Fires
+        // Helper: draw a character standing on ground
+        function drawOnGround(x, skin="#f1d1bb", clothes="#4a9", hat=false, tool=false, bag=false, scale=1) {
+            const s = CHAR_SIZE * scale;
+            const charHeight = s * 2.8;
+            const y = groundY - charHeight;
+            drawCharacter(x, skin, clothes, hat, tool, bag, scale, "foreground");
+        }
+
+        // Buildings & tents
+        drawHouse(100, 50, 40);  // small wooden house
+        drawTent(250, 45, 35);   // tent
+        drawHouse(400, 60, 45);  // larger structure
+        drawTent(550, 50, 40);   // another tent
+        drawHouse(700, 50, 40);  // final house
+
+        // Trees for background depth
+        drawTree(50, 20, "hills");
+        drawTree(750, 18, "hills");
+
+        // Fires for battle ambiance
         ctx.fillStyle = "rgba(255,80,0,0.6)";
-        ctx.fillRect(150, groundY - 35, 20, 35);
-        ctx.fillRect(300, groundY - 40, 25, 40);
+        ctx.fillRect(180, groundY - 35, 20, 35);
+        ctx.fillRect(420, groundY - 40, 25, 40);
+        ctx.fillRect(620, groundY - 30, 20, 30);
 
-        // Characters, placed manually
-        const positions = [180, 300, 420, 550, 680];
-        positions.forEach((x, i) => {
-            drawCharacter(x, "#f1d1bb", ["#e96","#b85","#4ac","#e96","#b85"][i], false, false, false, 0.8);
-        });
+        // Main group of characters
+        const positions = [120, 200, 300, 380, 500, 580, 680]; 
+        const colors = ["#e96","#b85","#4ac","#e96","#b85","#4ac","#e96"];
+        positions.forEach((x,i) => drawOnGround(x, "#f1d1bb", colors[i], false, false, false, 0.8));
 
-        drawCharacter(200, "#f1d1bb", "#4a9");
-        drawJosiah(500);
-        drawCharacter(550, "#f1d1bb", "#4a9");
+        // Josiah and you
+        drawOnGround(220, "#4a2f20", "#2b8a3e", true, false, true, 1); // Josiah
+        drawOnGround(550, "#f1d1bb", "#4a9", false, false, false, 1);  // Player
 
+        // Extra NPCs scattered
+        drawOnGround(320, "#f1d1bb", "#e5a", false, false, false, 0.75);
+        drawOnGround(470, "#f1d1bb", "#b85", false, false, false, 0.7);
+        drawOnGround(620, "#f1d1bb", "#a55", false, false, false, 0.75);
+
+        // HUD
         drawHUD();
     }
+
 
 
         function drawFinalCampfireVisual() {
