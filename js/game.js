@@ -380,6 +380,7 @@ function drawCourthouseInterior(){
     // =========================
 
 function scene1() {
+    bgMusic.volume = 0.2
     scene1Visual();
     const lines = [
         "The year is 1851. Mexico has just lost the war, and the United States has taken California. Settlers from all over now flock west, chasing the smell of gold. You walk beside your wagon headed for the Sierra Nevada, hoping for a chance to stake a claim to find some gold.",
@@ -417,6 +418,7 @@ function scene1() {
 }
 
 function scene1AfterChoice(choiceKey) {
+    bgMusic.volume = 0.2
     if (choiceKey === "A") {
         typeText("Josiah: 'I hope you’re right. It would mean the world.'", () => {
             scene2();
@@ -433,6 +435,7 @@ function scene1AfterChoice(choiceKey) {
 }
 
 function scene2() {
+    bgMusic.volume = 0.2
     scene2Visual();
     const lines = [
         "After some time, you finally reach a river valley crowded with tents and rough shacks. As you look around, you see the Gold Rush is in full swing: Americans like you from the East, European fortune seekers, Chilean and Sonoran miners, Kanakas from the Pacific, and growing numbers of Chinese laborers work the banks.",
@@ -474,6 +477,7 @@ function scene2() {
 }
 
 function npc3Scene() {
+    bgMusic.volume = 0.2
     npc3Visual();
     const lines = [
         "As you examine the banks, a small group approaches. At their head walks Aiyana, a Maidu woman, carrying woven baskets. You see those behind her carrying items foraged from around the river.",
@@ -514,6 +518,7 @@ function npc3Scene() {
 }
 
 function scene3() {
+    bgMusic.volume = 0.2
     courthouseVisual();
     const lines = [
         "Having finally found a place to claim, you begin trying to find gold, but fail. As night falls, you head to the small settlement put together for those searching for gold. You eat and fall asleep, thinking about Aiyana.",
@@ -543,6 +548,7 @@ function scene3() {
 }
 
 function sceneCoercion() {
+    bgMusic.volume = 0
     drawBackground();
     ctx.fillStyle = "rgba(0,0,0,0.5)"; // darker overlay for tension
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -597,6 +603,7 @@ function sceneCoercion() {
 
 
     function sceneCourthouse() {
+        bgMusic.volume = 0.2
         courthouseVisual();
         const lines = [
             "The judge continues and the crowd murmurs. At the edge of the courthouse a white settler stands with a man who looks worn and watchful.",
@@ -619,6 +626,7 @@ function sceneCoercion() {
 
 
     function sceneJosiahAndArrivant() {
+        bgMusic.volume = 0.2
         josiahAndSolomonVisual();
         const lines = [
             'Josiah: "We have come a long way and things are changing fast. I will keep an eye out for you."',
@@ -656,6 +664,7 @@ function sceneCoercion() {
     }
 
     function scene4Normal() {
+        bgMusic.volume = 0.2
         saloonVisual();
         const lines = [
             "One evening, miners and townspeople gather outside a saloon. Elias sits on a crate, reading a notice.",
@@ -701,6 +710,7 @@ function sceneCoercion() {
 
 
     function sceneBattle() {
+        bgMusic.volume = 0
         battleVisual();
         const lines = [
             "At dawn, you ride into the hills with Josiah and several others. You find the camp filled with small shelters.",
