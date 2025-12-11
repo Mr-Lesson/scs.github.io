@@ -746,38 +746,25 @@ function sceneCoercion() {
     }
 
     function finalScene() {
-        // The final reflection: campfire with all NPCs, 3 endings based on combination of gold + morality
         finalVisual();
-5
-        // calculate outcome metric: combine gold and morality with weights
-        // We'll normalize roughly: gold threshold ~ 50, morality threshold ~ 2
+
         const goldScore = gold;
         const moralScore = morality;
 
-        // determine ending tier:
-        // - Good ending: high morality (>=3) regardless of gold OR moderate morality and moderate gold
-        // - Mixed ending: moderate morality (-1..2) and moderate gold
-        // - Bad ending: low morality (<= -2) and/or very high gold but negative morality (wealth without conscience)
-        // We'll compute a small decision:
-        let endingType = "mixed"; // default
-
-        if (moralScore >= 3 || (moralScore >= 1 && goldScore >= 40)) {
-            endingType = "good";
-        } else if (moralScore <= -2 || (goldScore >= 80 && moralScore <= 0)) {
-            endingType = "bad";
-        } else {
-            endingType = "mixed";
+        // Determine ending type based on choices
+        let endingType = "mixed"; 
+        if (choicesLog.includes("joined_fully") || choicesLog.includes("battle_fire_kill")) {
+            endingType = "good"; // player helped settlers
+        } else if (choicesLog.includes("confront_settler") || choicesLog.includes("npc3_buy") || choicesLog.includes("battle_shield")) {
+            endingType = "bad"; // player helped others
         }
 
-        // Build reflection lines with references to player's choices
-        // Always include key recap: gold total and morality
         const reflectionIntro = [
-            "Fast forward to 1855, the gold is all but gone.",
-            `You have made ${gold} gold in total during your time here.`,
-            `The choices you made left a mark: morality score ${morality}.`
+            "Years have passed. The Gold Rush has ended, leaving memories, consequences, and fortunes made or lost.",
+            `During your time here, you accumulated ${gold} gold.`,
+            `Your actions have left their mark: morality score ${morality}.`
         ];
 
-        // Begin sequence
         let idx = 0;
         function nextReflection() {
             if (idx < reflectionIntro.length) {
@@ -787,61 +774,100 @@ function sceneCoercion() {
                 return;
             }
 
-            // now show campfire visual & NPC positions
-            // draw an evening campfire scene
             drawFinalCampfireVisual();
 
-            // Extended reflection dialogues, then final ending text
-            if (endingType === "good") {
-                const linesGood = [
-                    "You gather around a small campfire with Josiah, Aiyana, Solomon, and a few others.",
-                    'Josiah: "We remember the ones who stood with us."',
-                    'Aiyana: "You did not always choose the easy path, but some of your choices helped keep people alive."',
-                    "Around the fire, you discuss rebuilding small communities, sharing land where you can, and protecting one another.",
-                    "Although riches were not overflowing, you find a measure of peace — your name is remembered kindly in the valley."
-                ];
-                playReflectionLines(linesGood);
-            } else if (endingType === "mixed") {
-                const linesMixed = [
-                    "The campfire crackles as Josiah, Aiyana and Solomon look at you with mixed emotions.",
-                    'Josiah: "You did what you could at times and looked the other way at others."',
-                    'Aiyana: "Some wounds cannot be mended by gold."',
-                    "You have some money left, and some good reputation, but the choices you made left consequences — some people prospered, others did not.",
-                    "Your children might live slightly easier lives, but the valley still remembers both kindness and cruelty."
-                ];
-                playReflectionLines(linesMixed);
-            } else { // bad
-                const linesBad = [
-                    "Everyone sits more quietly than you'd expect. The embers glow and the faces around it are filled with cold calculation.",
-                    'Josiah: "You prospered, but at what cost?"',
-                    'Solomon: "When men choose gold over life, the land keeps that record."',
-                    "You are wealthy now — some call you a successful settler — but the few friendships you had are broken or bitter.",
-                    "You find yourself alone by a warm bed of coin, with a long road of consequence ahead."
-                ];
-                playReflectionLines(linesBad);
-            }
-        }
+            let linesEnd = [];
 
-        function playReflectionLines(lines) {
-            let j = 0;
-            function step() {
-                if (j < lines.length) {
-                    nextLineCallback = step;
-                    typeText(lines[j], step);
-                    j++;
+            if (endingType === "good") {
+                linesEnd.push(
+                    "Around the campfire, you sit with Josiah, Aiyana, Solomon, and a few others. Your pockets are full, and your claim secured.",
+                    'Josiah: "You prospered, but some of us paid the price for it."',
+                    'Aiyana: "The land is safer now, but the stories of loss linger."',
+                    "Ironically, your choices ensured your own success, while communities you could have helped remain scarred.",
+                    "You spend your days managing your claim and wealth, occasionally glancing at those who were left behind. The valley knows your name — respected, feared, and remembered for your pragmatism."
+                );
+
+                if (choicesLog.includes("joined_fully")) {
+                    linesEnd.push("Your full participation in the settlers' expeditions brought gold, and secured your standing, but cost lives and goodwill.");
+                }
+                if (choicesLog.includes("battle_fire_kill")) {
+                    linesEnd.push("The settlement you attacked lies in ashes, a reminder that prosperity often comes at the expense of others.");
+                }
+
+            } else if (endingType === "bad") {
+                linesEnd.push(
+                    "The campfire flickers as you sit among Josiah, Aiyana, and Solomon, faces tired but grateful.",
+                    'Josiah: "You stood with us, even when it meant risk and loss."',
+                    'Aiyana: "The land is harder for us still, but your actions gave some hope."',
+                    "You sacrificed gold, comfort, and safety to protect others, and the valley still bears the scars of what you tried to prevent.",
+                    "Though hardships abound, you know that your conscience is intact. Some doors closed to you, but you left the mark of compassion behind."
+                );
+
+                if (choicesLog.includes("confront_settler")) {
+                    linesEnd.push("Standing up to the settler saved Josiah from forced labor, though it cost you opportunities and safety.");
+                }
+                if (choicesLog.includes("npc3_buy")) {
+                    linesEnd.push("Buying from Aiyana helped her community survive, even if it reduced your own gains.");
+                }
+                if (choicesLog.includes("battle_shield")) {
+                    linesEnd.push("Shielding the fleeing villagers cost you materially, but some lives were saved thanks to your courage.");
+                }
+
+            } else { // mixed endings
+                // Determine type of mixed ending based on specific combination of actions
+                if (choicesLog.includes("joined_reluctant") || choicesLog.includes("battle_fire_miss")) {
+                    // Player acted cautiously / ambiguously
+                    linesEnd.push(
+                        "The campfire crackles as you sit with Josiah, Aiyana, and Solomon, and the other settlers you rode with.",
+                        'Josiah: "You sometimes helped, sometimes stayed back. Your heart was torn."',
+                        'Aiyana: "You did not fully stand with us, yet spared more than you took."',
+                        "You gained some wealth and security, but the consequences of your choices linger in the shadows.",
+                        "Some lives were saved, some claims earned, but the valley remembers both your mercy and your compromises."
+                    );
+                } else if (choicesLog.includes("offer_work_to_josiah") || choicesLog.includes("josiah_help_solomon")) {
+                    // Player helped some individuals, but not the wider community
+                    linesEnd.push(
+                        "You sit by the fire with Josiah and Solomon, exchanging quiet smiles and small stories.",
+                        'Josiah: "You helped a few of us. That counts for something."',
+                        'Solomon: "Your choices were selective, but some good came of it."',
+                        "You did not gain all the wealth you might have, nor did you prevent every injustice, but your actions left pockets of hope.",
+                        "The valley remembers you inconsistently — a friend to some, indifferent to others."
+                    );
                 } else {
-                    // final summary text and end
-                    nextLineCallback = null;
-                    waitingForEnter = false;
-                    setTimeout(() => {
-                        const wrap = `=== THE END ===\nYour final gold: ${gold}. Morality: ${morality}. Choices: ${choicesLog.join(", ")}`;
-                        endGame(wrap);
-                    }, 600);
+                    // Neutral mixed ending for miscellaneous choices
+                    linesEnd.push(
+                        "Around the campfire, everyone looks at you with a mixture of gratitude and disappointment.",
+                        'Josiah: "You acted when you could, but not always."',
+                        'Aiyana: "Gold and conscience rarely walk hand in hand."',
+                        "You leave the valley with some wealth, some goodwill, and some regrets.",
+                        "History will remember you as a complicated figure — neither hero nor villain, just human."
+                    );
                 }
             }
-            step();
+
+            playReflectionLines(linesEnd);
+
+            function playReflectionLines(lines) {
+                let j = 0;
+                function step() {
+                    if (j < lines.length) {
+                        nextLineCallback = step;
+                        typeText(lines[j], step);
+                        j++;
+                    } else {
+                        nextLineCallback = null;
+                        waitingForEnter = false;
+                        setTimeout(() => {
+                            const wrap = `=== THE END ===\nYour final gold: ${gold}. Morality: ${morality}. Choices: ${choicesLog.join(", ")}`;
+                            endGame(wrap);
+                        }, 600);
+                    }
+                }
+                step();
+            }
         }
 
         nextReflection();
     }
+
 });
